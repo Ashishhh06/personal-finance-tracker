@@ -1,14 +1,18 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import TimePeriodSelector from '../../components/common/TimePeriodSelector';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
+  const [period, setPeriod] = useState('month');
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div>
       <h1>Dashboard</h1>
-      <p>Welcome, {user?.name}!</p>
+      <TimePeriodSelector value={period} onChange={setPeriod} />
+      <p style={{ marginTop: '1rem' }}>Welcome, {user?.name}!</p>
       <p>Email: {user?.email}</p>
+      <p>Selected period: {period}</p>
       <button onClick={logout}>Logout</button>
     </div>
   );
