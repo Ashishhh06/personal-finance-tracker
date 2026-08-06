@@ -8,6 +8,7 @@ import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import ExpenseList from './pages/Expenses/ExpenseList';
 import IncomeList from './pages/Income/IncomeList';
+import IncomeVsExpense from './pages/Income/IncomeVsExpense';
 import GoalsList from './pages/Goals/GoalsList';
 import PortfolioOverview from './pages/Investments/PortfolioOverview';
 import BudgetOverview from './pages/Budget/BudgetOverview';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/expenses" element={<ExpenseList />} />
             <Route path="/income" element={<IncomeList />} />
+            <Route path="/income/compare" element={<IncomeVsExpense />} />
             <Route path="/goals" element={<GoalsList />} />
             <Route path="/investments" element={<PortfolioOverview />} />
             <Route path="/budget" element={<BudgetOverview />} />
