@@ -45,7 +45,7 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
       isRecurring,
       recurringFrequency: isRecurring ? recurringFrequency : null,
       tags: tags
-        ? tags.split(',').map((t) => t.trim()).filter(Boolean)
+        ? tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
         : [],
       extraData,
     };
@@ -132,24 +132,20 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
         </select>
       </div>
 
+
       {type === 'expense' && (
         <div style={groupStyle}>
-          <label>
-            <input
-              type="checkbox"
-              checked={tags.includes('food') || false}
-              onChange={() => {}}
-              style={{ display: 'none' }}
-            />
-          </label>
           <label>Tags (comma-separated)</label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            placeholder="e.g. food, trip:Goa2026"
+            placeholder="e.g. food, movies, trip:Goa2026"
             style={inputStyle}
           />
+          <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem' }}>
+          Common tags: food, movies, trips, shopping
+          </p>
         </div>
       )}
 
