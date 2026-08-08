@@ -8,6 +8,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const goalRoutes = require('./routes/goalRoutes');
+const investmentRoutes = require('./routes/investmentRoutes');
 
 connectDB();
 
@@ -23,6 +24,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/goals', goalRoutes);
+app.use('/api/investments', investmentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
