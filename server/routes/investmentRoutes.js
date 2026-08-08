@@ -6,9 +6,11 @@ const {
   createInvestment,
   updateInvestment,
   deleteInvestment,
+  getInvestmentSummary,
 } = require('../controllers/investmentController');
 const { protect } = require('../middleware/authMiddleware');
 
+router.get('/summary', protect, getInvestmentSummary);
 router.get('/', protect, getInvestments);
 router.get('/:id', protect, getInvestmentById);
 router.post('/', protect, createInvestment);
