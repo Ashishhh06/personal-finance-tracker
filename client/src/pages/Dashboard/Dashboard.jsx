@@ -5,6 +5,7 @@ import { getDashboardSummary } from '../../services/dashboardService';
 import TimePeriodSelector from '../../components/common/TimePeriodSelector';
 import Card from '../../components/common/Card';
 import Spinner from '../../components/common/Spinner';
+import { getNetWorth } from '../../services/netWorthService';
 
 const COLORS = ['#4f46e5', '#f59e0b', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#e11d48', '#0284c7'];
 
@@ -14,19 +15,22 @@ const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      setLoading(true);
-      try {
-        const res = await getDashboardSummary(period);
-        setData(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSummary();
+ useEffect(() => {
+  const fetchSummary = async () => {
+    setLoading(true);
+    try {
+      const [summaryRes, netWorthRes] = await Promise.all([
+        getDashboardSummary(period),
+        getNetWorth(),
+      ]);
+      setData({ ...summaryRes.data, netWorth: netWorthRes.data.netWorth });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchSummary();
   }, [period]);
 
   if (loading || !data) {
@@ -140,8 +144,14 @@ const Dashboard = () => {
       </div>
 
       {/* Placeholder sections for future steps */}
-      <div style={{ marginTop: '1.5rem', padding: '1rem', color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center' }}>
-        Budget highlights, active goals, net worth, and AI insights will appear here in later steps.
+      <Card style={{ marginTop: '1.5rem' }}>
+        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Net Worth</p>
+        <p style={{ fontSize: '1.8rem', fontWeight: 700, color: data.netWorth >= 0 ? '#16a34a' : '#dc2626' }}>
+          ₹{data.netWorth?.toLocaleString() ?? '—'}
+        </p>
+      </Card>
+      <div style={{ marginTop: '1rem', padding: '1rem', color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center' }}>
+        Budget highlights, active goals, and AI insights will appear here in later steps.
       </div>
     </div>
   );
