@@ -13,6 +13,7 @@ const propertyRoutes = require('./routes/propertyRoutes');
 const bankAccountRoutes = require('./routes/bankAccountRoutes');
 const loanRoutes = require('./routes/loanRoutes');
 const netWorthRoutes = require('./routes/netWorthRoutes');
+const budgetRoutes = require('./routes/budgetRoutes');
 
 connectDB();
 
@@ -33,6 +34,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/bank-accounts', bankAccountRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/networth', netWorthRoutes);
+app.use('/api/budgets', budgetRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
