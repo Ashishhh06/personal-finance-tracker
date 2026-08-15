@@ -9,13 +9,20 @@ const loanSchema = new mongoose.Schema(
     },
     loanType: {
       type: String,
-      enum: ['home', 'car', 'personal', 'education', 'other'],
+      enum: ['home', 'car', 'personal', 'education', 'debt', 'other'],
       required: true,
     },
+    // For formal loans: the bank/lender. For informal debts: the person's name.
     lenderName: {
       type: String,
       required: true,
       trim: true,
+    },
+    // Who owes whom - relevant mainly for "debt" type (defaults to owed_by_me for bank loans)
+    direction: {
+      type: String,
+      enum: ['owed_by_me', 'owed_to_me'],
+      default: 'owed_by_me',
     },
     principalAmount: {
       type: Number,
@@ -25,9 +32,10 @@ const loanSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    // Optional now - informal debts often don't have a fixed EMI
     emiAmount: {
       type: Number,
-      required: true,
+      default: null,
     },
     interestRate: {
       type: Number,
@@ -35,15 +43,21 @@ const loanSchema = new mongoose.Schema(
     },
     tenureMonths: {
       type: Number,
-      required: true,
+      default: null,
     },
     startDate: {
       type: Date,
-      required: true,
+      default: Date.now,
     },
     nextDueDate: {
       type: Date,
-      required: true,
+      default: null,
+    },
+    // Free text for context - "lent for bike repair", "borrowed for rent shortfall", etc.
+    note: {
+      type: String,
+      default: '',
+      trim: true,
     },
     status: {
       type: String,

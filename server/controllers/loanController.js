@@ -4,7 +4,7 @@ const Category = require('../models/Category');
 
 const getLoans = async (req, res) => {
   try {
-    const loans = await Loan.find({ userId: req.user._id }).sort({ status: 1, nextDueDate: 1 });
+    const loans = await Loan.find({ userId: req.user._id }).sort({ status: 1, createdAt: -1 });
     res.status(200).json(loans);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch loans', error: error.message });
@@ -13,23 +13,29 @@ const getLoans = async (req, res) => {
 
 const createLoan = async (req, res) => {
   try {
-    const { loanType, lenderName, principalAmount, outstandingAmount, emiAmount, interestRate, tenureMonths, startDate, nextDueDate } = req.body;
+    const {
+      loanType, lenderName, direction, principalAmount, outstandingAmount,
+      emiAmount, interestRate, tenureMonths, startDate, nextDueDate, note,
+    } = req.body;
 
-    if (!loanType || !lenderName || !principalAmount || !emiAmount || !tenureMonths || !startDate || !nextDueDate) {
-      return res.status(400).json({ message: 'Missing required loan fields' });
+    // Only the essentials are required now - formal loan fields (EMI, tenure, due date) are optional
+    if (!loanType || !lenderName || !principalAmount) {
+      return res.status(400).json({ message: 'loanType, lenderName, and principalAmount are required' });
     }
 
     const loan = await Loan.create({
       userId: req.user._id,
       loanType,
       lenderName,
+      direction: direction || 'owed_by_me',
       principalAmount,
       outstandingAmount: outstandingAmount ?? principalAmount,
-      emiAmount,
+      emiAmount: emiAmount || null,
       interestRate: interestRate || 0,
-      tenureMonths,
-      startDate,
-      nextDueDate,
+      tenureMonths: tenureMonths || null,
+      startDate: startDate || new Date(),
+      nextDueDate: nextDueDate || null,
+      note: note || '',
     });
 
     res.status(201).json(loan);
@@ -43,7 +49,10 @@ const updateLoan = async (req, res) => {
     const loan = await Loan.findOne({ _id: req.params.id, userId: req.user._id });
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
-    const updatableFields = ['loanType', 'lenderName', 'principalAmount', 'outstandingAmount', 'emiAmount', 'interestRate', 'tenureMonths', 'startDate', 'nextDueDate', 'status'];
+    const updatableFields = [
+      'loanType', 'lenderName', 'direction', 'principalAmount', 'outstandingAmount',
+      'emiAmount', 'interestRate', 'tenureMonths', 'startDate', 'nextDueDate', 'note', 'status',
+    ];
     updatableFields.forEach((field) => {
       if (req.body[field] !== undefined) {
         loan[field] = req.body[field];
@@ -70,36 +79,50 @@ const deleteLoan = async (req, res) => {
 };
 
 // POST /api/loans/:id/pay-emi
+// Works for both formal EMI payments AND informal debt settlements.
+// Direction determines whether this creates an expense (you're paying) or income (they're paying you) transaction.
 const payEmi = async (req, res) => {
   try {
     const loan = await Loan.findOne({ _id: req.params.id, userId: req.user._id });
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
-    if (loan.status === 'closed') return res.status(400).json({ message: 'This loan is already closed' });
+    if (loan.status === 'closed') return res.status(400).json({ message: 'This is already closed' });
 
-    // Find or reasonably fall back for the "Loan EMI" category to link the transaction
-    let loanCategory = await Category.findOne({ name: 'Loan EMI', type: 'expense' });
+    // Allow a custom amount (useful for informal debts / partial settlements); default to EMI or full outstanding
+    const amount = req.body?.amount ? Number(req.body.amount) : (loan.emiAmount || loan.outstandingAmount);
 
-    // Create a linked expense transaction
+    const isDebtOwedByMe = loan.direction === 'owed_by_me';
+    const transactionType = isDebtOwedByMe ? 'expense' : 'income';
+
+    let category = null;
+    if (isDebtOwedByMe) {
+      category = await Category.findOne({ name: 'Loan EMI', type: 'expense' });
+    } else {
+      category = await Category.findOne({ name: 'Refunds', type: 'income' });
+    }
+
+    const noteText = loan.loanType === 'debt'
+      ? (isDebtOwedByMe ? `Repaid ${loan.lenderName}` : `${loan.lenderName} repaid you`)
+      : `EMI payment - ${loan.lenderName}`;
+
     await Transaction.create({
       userId: req.user._id,
-      type: 'expense',
-      categoryId: loanCategory?._id,
-      amount: loan.emiAmount,
+      type: transactionType,
+      categoryId: category?._id,
+      amount,
       date: new Date(),
-      note: `EMI payment - ${loan.lenderName}`,
+      note: noteText,
       paymentMethod: 'Bank Transfer',
       extraData: { loanId: loan._id.toString() },
     });
 
-    // Reduce outstanding balance (simplified - full EMI amount reduces principal, no amortization split)
-    loan.outstandingAmount = Math.max(0, loan.outstandingAmount - loan.emiAmount);
+    loan.outstandingAmount = Math.max(0, loan.outstandingAmount - amount);
 
-    // Advance next due date by 1 month
-    const next = new Date(loan.nextDueDate);
-    next.setMonth(next.getMonth() + 1);
-    loan.nextDueDate = next;
+    if (loan.nextDueDate) {
+      const next = new Date(loan.nextDueDate);
+      next.setMonth(next.getMonth() + 1);
+      loan.nextDueDate = next;
+    }
 
-    // Auto-close if fully paid off
     if (loan.outstandingAmount <= 0) {
       loan.status = 'closed';
     }
@@ -107,15 +130,26 @@ const payEmi = async (req, res) => {
     await loan.save();
     res.status(200).json(loan);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to process EMI payment', error: error.message });
+    res.status(500).json({ message: 'Failed to process payment', error: error.message });
   }
 };
 
 const getLoansSummary = async (req, res) => {
   try {
     const activeLoans = await Loan.find({ userId: req.user._id, status: 'active' });
-    const totalOutstanding = activeLoans.reduce((sum, l) => sum + l.outstandingAmount, 0);
-    res.status(200).json({ totalOutstanding, activeLoanCount: activeLoans.length });
+    const totalOwedByMe = activeLoans
+      .filter((l) => l.direction === 'owed_by_me')
+      .reduce((sum, l) => sum + l.outstandingAmount, 0);
+    const totalOwedToMe = activeLoans
+      .filter((l) => l.direction === 'owed_to_me')
+      .reduce((sum, l) => sum + l.outstandingAmount, 0);
+
+    res.status(200).json({
+      totalOutstanding: totalOwedByMe, // kept for backward compatibility with existing frontend
+      totalOwedByMe,
+      totalOwedToMe,
+      activeLoanCount: activeLoans.length,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch loans summary', error: error.message });
   }

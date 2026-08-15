@@ -25,7 +25,7 @@ const NetWorthPage = () => {
   if (loading || !data) return <Spinner />;
 
   const { netWorth, breakdown } = data;
-  const totalAssets = breakdown.bankTotal + breakdown.investmentTotal + breakdown.propertyTotal;
+  const totalAssets = breakdown.bankTotal + breakdown.investmentTotal + breakdown.propertyTotal + breakdown.receivablesTotal;
 
   const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid #f3f4f6' };
 
@@ -56,9 +56,15 @@ const NetWorthPage = () => {
             <span>Properties</span>
             <span>₹{breakdown.propertyTotal.toLocaleString()}</span>
           </div>
+          {breakdown.receivablesTotal > 0 && (
+            <div style={rowStyle}>
+              <span>Money Owed to You</span>
+              <span>₹{breakdown.receivablesTotal.toLocaleString()}</span>
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.75rem', fontWeight: 700 }}>
             <span>Total Assets</span>
-            <span>₹{totalAssets.toLocaleString()}</span>
+            <span>₹{(breakdown.bankTotal + breakdown.investmentTotal + breakdown.propertyTotal + breakdown.receivablesTotal).toLocaleString()}</span>
           </div>
         </Card>
 
