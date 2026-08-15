@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getCategories } from '../../services/categoryService';
 import { createTransaction, updateTransaction } from '../../services/transactionService';
 import Button from '../common/Button';
+import { getBudgetStatus } from '../../services/budgetService';
 
 const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => {
   const [categories, setCategories] = useState([]);
@@ -31,38 +32,65 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
 
-    const payload = {
-      type,
-      categoryId,
-      amount: Number(amount),
-      date,
-      note,
-      paymentMethod,
-      isRecurring,
-      recurringFrequency: isRecurring ? recurringFrequency : null,
-      tags: tags
-        ? tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
-        : [],
-      extraData,
-    };
-
-    try {
-      if (existingTransaction) {
-        await updateTransaction(existingTransaction._id, payload);
-      } else {
-        await createTransaction(payload);
-      }
-      onSuccess();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const payload = {
+    type,
+    categoryId,
+    amount: Number(amount),
+    date,
+    note,
+    paymentMethod,
+    isRecurring,
+    recurringFrequency: isRecurring ? recurringFrequency : null,
+    tags: tags
+      ? tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
+      : [],
+    extraData,
   };
+
+  // Pre-save budget check, only for new expenses (not edits, to keep this simple)
+  if (type === 'expense' && categoryId && !existingTransaction) {
+    try {
+      const dateObj = new Date(date);
+      const month = dateObj.getMonth() + 1;
+      const year = dateObj.getFullYear();
+      const statusRes = await getBudgetStatus(month, year);
+      const matchingBudget = statusRes.data.find((b) => b.categoryId === categoryId);
+
+      if (matchingBudget) {
+        const projectedSpent = matchingBudget.actualSpent + Number(amount);
+        const projectedPercent = Math.round((projectedSpent / matchingBudget.limitAmount) * 100);
+
+        if (projectedPercent > 100) {
+          const overBy = projectedPercent - 100;
+          const confirmed = window.confirm(
+            `This will put you ${overBy}% over your ${matchingBudget.category} budget for this month. Add anyway?`
+          );
+          if (!confirmed) return;
+        }
+      }
+    } catch (err) {
+      // If the budget check itself fails, don't block the user from saving - fail silently
+      console.error('Budget check failed:', err);
+    }
+  }
+
+  setLoading(true);
+  try {
+    if (existingTransaction) {
+      await updateTransaction(existingTransaction._id, payload);
+    } else {
+      await createTransaction(payload);
+    }
+    onSuccess();
+  } catch (err) {
+    setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const inputStyle = { width: '100%', padding: '0.5rem', marginTop: '0.25rem' };
   const groupStyle = { marginBottom: '1rem' };
