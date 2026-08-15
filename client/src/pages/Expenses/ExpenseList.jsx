@@ -8,6 +8,7 @@ import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
 import TransactionForm from '../../components/forms/TransactionForm';
+import ErrorState from '../../components/common/ErrorState';
 
 const ExpenseList = () => {
   const [period, setPeriod] = useState('month');
@@ -16,24 +17,27 @@ const ExpenseList = () => {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [error, setError] = useState(false);
 
   const fetchTransactions = async () => {
-    setLoading(true);
-    try {
-      const { startDate, endDate } = getRangeForPeriod(period);
-      const res = await getTransactions({
-        type: 'expense',
-        startDate,
-        endDate,
-        search: search || undefined,
-      });
-      setTransactions(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setError(false);
+  try {
+    const { startDate, endDate } = getRangeForPeriod(period);
+    const res = await getTransactions({
+      type: 'expense',
+      startDate,
+      endDate,
+      search: search || undefined,
+    });
+    setTransactions(res.data);
+  } catch (err) {
+    console.error(err);
+    setError(true);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchTransactions();
@@ -96,6 +100,8 @@ const ExpenseList = () => {
 
       {loading ? (
         <Spinner />
+      ) : error ? (
+        <ErrorState onRetry={fetchTransactions} />
       ) : transactions.length === 0 ? (
         <EmptyState message="No expenses found for this period." actionLabel="Add your first expense" onAction={handleAdd} />
       ) : (

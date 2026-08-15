@@ -51,9 +51,11 @@ const BudgetOverview = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1>Budget Planner — {MONTH_NAMES[month - 1]} {year}</h1>
-        <Button onClick={handleAdd}>+ Set Budget</Button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Button variant="secondary" onClick={() => window.location.href = '/budget/history'}>View History</Button>
+            <Button onClick={handleAdd}>+ Set Budget</Button>
+        </div>
       </div>
-
       {statuses.length === 0 ? (
         <EmptyState message="No budgets set for this month." actionLabel="Set your first budget" onAction={handleAdd} />
       ) : (

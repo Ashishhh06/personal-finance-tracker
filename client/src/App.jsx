@@ -18,6 +18,7 @@ import LoansList from './pages/Loans/LoansList';
 import BankAccountsList from './pages/BankAccounts/BankAccountsList';
 import InsightsPage from './pages/Insights/InsightsPage';
 import Settings from './pages/Settings/Settings';
+import BudgetHistory from './pages/Budget/BudgetHistory';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="/goals" element={<GoalsList />} />
             <Route path="/investments" element={<PortfolioOverview />} />
             <Route path="/budget" element={<BudgetOverview />} />
+            <Route path="/budget/history" element={<BudgetHistory />} />
             <Route path="/lifestyle" element={<LifestyleDashboard />} />
             <Route path="/networth" element={<NetWorthPage />} />
             <Route path="/loans" element={<LoansList />} />
