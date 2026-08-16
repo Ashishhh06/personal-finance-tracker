@@ -7,37 +7,38 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
-import TransactionForm from '../../components/forms/TransactionForm';
 import ErrorState from '../../components/common/ErrorState';
+import TransactionForm from '../../components/forms/TransactionForm';
 
 const IncomeList = () => {
   const [period, setPeriod] = useState('month');
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
   const fetchTransactions = async () => {
-  setLoading(true);
-  setError(false);
-  try {
-    const { startDate, endDate } = getRangeForPeriod(period);
-    const res = await getTransactions({
-      type: 'income',
-      startDate,
-      endDate,
-      search: search || undefined,
-    });
-    setTransactions(res.data);
-  } catch (err) {
-    console.error(err);
-    setError(true);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    setError(false);
+    try {
+      const { startDate, endDate } = getRangeForPeriod(period);
+      const res = await getTransactions({
+        type: 'income',
+        startDate,
+        endDate,
+        search: search || undefined,
+      });
+      setTransactions(res.data);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,16 +74,15 @@ const IncomeList = () => {
 
   return (
     <div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h1>Income</h1>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button variant="secondary" onClick={() => window.location.href = '/income/compare'}>
-                    Income vs Expense
-                </Button>
-                <Button onClick={handleAdd}>+ Add Income</Button>
-            </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h1>Income</h1>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Button variant="secondary" onClick={() => window.location.href = '/income/compare'}>
+            Income vs Expense
+          </Button>
+          <Button onClick={handleAdd}>+ Add Income</Button>
         </div>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <TimePeriodSelector value={period} onChange={setPeriod} />
@@ -104,12 +104,12 @@ const IncomeList = () => {
       </Card>
 
       {loading ? (
-      <Spinner />
-        ) : error ? (
-          <ErrorState onRetry={fetchTransactions} />
-        ) : transactions.length === 0 ? (
-          <EmptyState message="No income entries found for this period." actionLabel="Add your first income" onAction={handleAdd} />
-        ) : (
+        <Spinner />
+      ) : error ? (
+        <ErrorState onRetry={fetchTransactions} />
+      ) : transactions.length === 0 ? (
+        <EmptyState message="No income entries found for this period." actionLabel="Add your first income" onAction={handleAdd} />
+      ) : (
         <Card>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>

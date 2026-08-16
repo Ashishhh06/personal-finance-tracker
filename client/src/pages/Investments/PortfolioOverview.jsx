@@ -11,6 +11,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 import InvestmentForm from '../../components/forms/InvestmentForm';
 import PropertyForm from '../../components/forms/PropertyForm';
 
@@ -29,6 +30,7 @@ const PortfolioOverview = () => {
   const [investments, setInvestments] = useState([]);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedType, setExpandedType] = useState(null);
   const [isInvModalOpen, setIsInvModalOpen] = useState(false);
@@ -38,6 +40,7 @@ const PortfolioOverview = () => {
 
   const fetchAll = async () => {
     setLoading(true);
+    setError(false);
     try {
       const [summaryRes, investmentsRes, propertiesRes] = await Promise.all([
         getInvestmentSummary(),
@@ -49,6 +52,7 @@ const PortfolioOverview = () => {
       setProperties(propertiesRes.data);
     } catch (err) {
       console.error(err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -76,7 +80,9 @@ const PortfolioOverview = () => {
   };
   const handlePropertySuccess = () => { setIsPropModalOpen(false); fetchAll(); };
 
-  if (loading || !summary) return <Spinner />;
+  if (loading) return <Spinner />;
+  if (error) return <ErrorState onRetry={fetchAll} />;
+  if (!summary) return null;
 
   const chartData = summary.allocationBreakdown.map((item) => ({
     name: TYPE_LABELS[item.type] || item.type,
@@ -101,7 +107,6 @@ const PortfolioOverview = () => {
         </div>
       </div>
 
-      {/* Top summary card */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
         <Card>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Invested</p>
@@ -119,7 +124,6 @@ const PortfolioOverview = () => {
         </Card>
       </div>
 
-      {/* Allocation chart */}
       {chartData.length > 0 && (
         <Card style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ marginBottom: '1rem' }}>Allocation</h3>
@@ -137,7 +141,6 @@ const PortfolioOverview = () => {
         </Card>
       )}
 
-      {/* Filter chips */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
         {FILTERS.map((f) => (
           <button
@@ -158,7 +161,6 @@ const PortfolioOverview = () => {
         ))}
       </div>
 
-      {/* Grouped, collapsible investment list */}
       {investments.length === 0 ? (
         <EmptyState message="No investments yet." actionLabel="Add your first investment" onAction={handleAddInvestment} />
       ) : (
@@ -204,7 +206,7 @@ const PortfolioOverview = () => {
                           ? inv.purchasePrice
                           : inv.purchasePrice * (inv.quantity || 0);
                         const current = inv.investmentType === 'fd'
-                          ? inv.purchasePrice // simplified display; real growth calc happens in summary
+                          ? inv.purchasePrice
                           : (inv.currentPrice ?? inv.purchasePrice) * (inv.quantity || 0);
                         const returnPct = invested > 0 ? Math.round(((current - invested) / invested) * 10000) / 100 : 0;
 
@@ -231,7 +233,6 @@ const PortfolioOverview = () => {
         </Card>
       )}
 
-      {/* Properties section */}
       <h3 style={{ marginBottom: '1rem' }}>Properties</h3>
       {properties.length === 0 ? (
         <EmptyState message="No properties added yet." actionLabel="Add a property" onAction={handleAddProperty} />

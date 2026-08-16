@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 import BudgetForm from '../../components/forms/BudgetForm';
 
 const STATUS_COLORS = { green: '#16a34a', yellow: '#f59e0b', red: '#dc2626' };
@@ -16,15 +17,18 @@ const BudgetOverview = () => {
   const [year] = useState(now.getFullYear());
   const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchStatus = async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await getBudgetStatus(month, year);
       setStatuses(res.data);
     } catch (err) {
       console.error(err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -41,21 +45,22 @@ const BudgetOverview = () => {
     fetchStatus();
   };
 
-  // Days remaining in current month, for the check-in nudge
   const daysInMonth = new Date(year, month, 0).getDate();
   const daysRemaining = daysInMonth - now.getDate();
 
   if (loading) return <Spinner />;
+  if (error) return <ErrorState onRetry={fetchStatus} />;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1>Budget Planner — {MONTH_NAMES[month - 1]} {year}</h1>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button variant="secondary" onClick={() => window.location.href = '/budget/history'}>View History</Button>
-            <Button onClick={handleAdd}>+ Set Budget</Button>
+          <Button variant="secondary" onClick={() => window.location.href = '/budget/history'}>View History</Button>
+          <Button onClick={handleAdd}>+ Set Budget</Button>
         </div>
       </div>
+
       {statuses.length === 0 ? (
         <EmptyState message="No budgets set for this month." actionLabel="Set your first budget" onAction={handleAdd} />
       ) : (
@@ -89,7 +94,6 @@ const BudgetOverview = () => {
                 {b.status === 'yellow' && ' — getting close'}
               </p>
 
-              {/* Weekly check-in nudge */}
               <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.75rem' }}>
                 {b.limitAmount - b.actualSpent >= 0
                   ? `${daysRemaining} days left, ₹${(b.limitAmount - b.actualSpent).toLocaleString()} left in this budget`

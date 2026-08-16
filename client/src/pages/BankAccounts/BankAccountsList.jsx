@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 import BankAccountForm from '../../components/forms/BankAccountForm';
 
 const TYPE_LABELS = { savings: 'Savings', current: 'Current', emergency_fund: 'Emergency Fund', salary: 'Salary', other: 'Other' };
@@ -12,16 +13,19 @@ const TYPE_LABELS = { savings: 'Savings', current: 'Current', emergency_fund: 'E
 const BankAccountsList = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
 
   const fetchAccounts = async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await getBankAccounts();
       setAccounts(res.data);
     } catch (err) {
       console.error(err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -41,6 +45,7 @@ const BankAccountsList = () => {
   const total = accounts.reduce((sum, a) => sum + a.currentBalance, 0);
 
   if (loading) return <Spinner />;
+  if (error) return <ErrorState onRetry={fetchAccounts} />;
 
   return (
     <div>

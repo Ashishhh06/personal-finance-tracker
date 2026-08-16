@@ -6,38 +6,42 @@ import TimePeriodSelector from '../../components/common/TimePeriodSelector';
 import Card from '../../components/common/Card';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 
 const COLORS = ['#4f46e5', '#f59e0b', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#e11d48', '#0284c7'];
-const MAX_SLICES = 6; // show top N tags individually, group the rest into "Other"
+const MAX_SLICES = 6;
 
 const LifestyleDashboard = () => {
   const [period, setPeriod] = useState('month');
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const { startDate, endDate } = getRangeForPeriod(period);
+      const res = await getTransactions({
+        type: 'expense',
+        startDate,
+        endDate,
+      });
+      const taggedOnly = res.data.filter((t) => t.tags && t.tags.length > 0);
+      setTransactions(taggedOnly);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const { startDate, endDate } = getRangeForPeriod(period);
-        const res = await getTransactions({
-          type: 'expense',
-          startDate,
-          endDate,
-        });
-        // Only keep expenses that actually have at least one tag
-        const taggedOnly = res.data.filter((t) => t.tags && t.tags.length > 0);
-        setTransactions(taggedOnly);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period]);
 
-  // Dynamically build totals per tag - works for ANY tag the user has typed, not just fixed ones
   const tagTotals = {};
   transactions.forEach((t) => {
     t.tags.forEach((tag) => {
@@ -45,10 +49,8 @@ const LifestyleDashboard = () => {
     });
   });
 
-  // Sort tags by amount, descending
   const sortedTags = Object.entries(tagTotals).sort((a, b) => b[1] - a[1]);
 
-  // Keep top N individually, group the rest into "Other"
   let chartData = sortedTags.slice(0, MAX_SLICES).map(([tag, amount]) => ({
     name: tag.charAt(0).toUpperCase() + tag.slice(1),
     value: amount,
@@ -70,6 +72,8 @@ const LifestyleDashboard = () => {
 
       {loading ? (
         <Spinner />
+      ) : error ? (
+        <ErrorState onRetry={fetchData} />
       ) : transactions.length === 0 ? (
         <EmptyState message="No tagged expenses found for this period. Add a tag (e.g. food, movies, trips, shopping, gym, gifts - anything you like) to an expense to see it here." />
       ) : (

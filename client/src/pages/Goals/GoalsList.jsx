@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 import GoalForm from '../../components/forms/GoalForm';
 
 const GoalCard = ({ goal, onEdit, onDelete, isCompleted }) => (
@@ -46,17 +47,20 @@ const GoalCard = ({ goal, onEdit, onDelete, isCompleted }) => (
 const GoalsList = () => {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
 
   const fetchSummary = async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await getGoalsSummary();
       setSummary(res.data);
     } catch (err) {
       console.error(err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -87,9 +91,9 @@ const GoalsList = () => {
     fetchSummary();
   };
 
-  if (loading || !summary) {
-    return <Spinner />;
-  }
+  if (loading) return <Spinner />;
+  if (error) return <ErrorState onRetry={fetchSummary} />;
+  if (!summary) return null;
 
   return (
     <div>

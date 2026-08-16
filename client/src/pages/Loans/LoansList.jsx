@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
 import LoanForm from '../../components/forms/LoanForm';
 
 const TYPE_LABELS = { home: 'Home', car: 'Car', personal: 'Personal', education: 'Education', debt: 'Personal Debt', other: 'Other' };
@@ -13,18 +14,21 @@ const LoansList = () => {
   const [loans, setLoans] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLoan, setEditingLoan] = useState(null);
   const [payingId, setPayingId] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(false);
     try {
       const [loansRes, summaryRes] = await Promise.all([getLoans(), getLoansSummary()]);
       setLoans(loansRes.data);
       setSummary(summaryRes.data);
     } catch (err) {
       console.error(err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -58,7 +62,9 @@ const LoansList = () => {
     }
   };
 
-  if (loading || !summary) return <Spinner />;
+  if (loading) return <Spinner />;
+  if (error) return <ErrorState onRetry={fetchData} />;
+  if (!summary) return null;
 
   const activeLoans = loans.filter((l) => l.status === 'active');
   const closedLoans = loans.filter((l) => l.status === 'closed');
