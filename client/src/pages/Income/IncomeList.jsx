@@ -8,6 +8,7 @@ import Modal from '../../components/common/Modal';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
 import TransactionForm from '../../components/forms/TransactionForm';
+import ErrorState from '../../components/common/ErrorState';
 
 const IncomeList = () => {
   const [period, setPeriod] = useState('month');
@@ -15,26 +16,28 @@ const IncomeList = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
   const fetchTransactions = async () => {
-    setLoading(true);
-    try {
-      const { startDate, endDate } = getRangeForPeriod(period);
-      const res = await getTransactions({
-        type: 'income',
-        startDate,
-        endDate,
-        search: search || undefined,
-      });
-      setTransactions(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  setLoading(true);
+  setError(false);
+  try {
+    const { startDate, endDate } = getRangeForPeriod(period);
+    const res = await getTransactions({
+      type: 'income',
+      startDate,
+      endDate,
+      search: search || undefined,
+    });
+    setTransactions(res.data);
+  } catch (err) {
+    console.error(err);
+    setError(true);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     fetchTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,10 +104,12 @@ const IncomeList = () => {
       </Card>
 
       {loading ? (
-        <Spinner />
-      ) : transactions.length === 0 ? (
-        <EmptyState message="No income entries found for this period." actionLabel="Add your first income" onAction={handleAdd} />
-      ) : (
+      <Spinner />
+        ) : error ? (
+          <ErrorState onRetry={fetchTransactions} />
+        ) : transactions.length === 0 ? (
+          <EmptyState message="No income entries found for this period." actionLabel="Add your first income" onAction={handleAdd} />
+        ) : (
         <Card>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
