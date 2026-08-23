@@ -3,6 +3,7 @@ import { getCategories } from '../../services/categoryService';
 import { createTransaction, updateTransaction } from '../../services/transactionService';
 import Button from '../common/Button';
 import { getBudgetStatus } from '../../services/budgetService';
+import { autoCategorize } from '../../services/transactionService';
 
 const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => {
   const [categories, setCategories] = useState([]);
@@ -19,6 +20,8 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
   const [extraData, setExtraData] = useState(existingTransaction?.extraData || {});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [aiConfidence, setAiConfidence] = useState(null);
+  const [aiSuggesting, setAiSuggesting] = useState(false);
 
   useEffect(() => {
     getCategories(type).then((res) => setCategories(res.data));
@@ -30,6 +33,35 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
   const handleExtraFieldChange = (field, value) => {
     setExtraData((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+  if (type !== 'expense' || !note || note.trim().length < 3 || existingTransaction) {
+    return;
+  }
+
+  const timer = setTimeout(async () => {
+    setAiSuggesting(true);
+    try {
+      const res = await autoCategorize(note);
+      if (res.data.category) {
+        const matchedCategory = categories.find(
+          (c) => c.name.toLowerCase() === res.data.category.toLowerCase()
+        );
+        if (matchedCategory) {
+          setCategoryId(matchedCategory._id);
+          setAiConfidence(res.data.confidence);
+        }
+      }
+    } catch (err) {
+      console.error('Auto-categorize failed:', err);
+    } finally {
+      setAiSuggesting(false);
+    }
+  }, 600);
+
+  return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [note, type, categories]);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -147,6 +179,14 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
           placeholder="e.g. Swiggy dinner order"
           style={inputStyle}
         />
+        {aiSuggesting && (
+          <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem' }}>Checking category...</p>
+        )}
+        {!aiSuggesting && aiConfidence !== null && aiConfidence < 50 && (
+          <p style={{ fontSize: '0.8rem', color: '#f59e0b', marginTop: '0.25rem' }}>
+            AI wasn't sure — please confirm the category.
+          </p>
+        )}
       </div>
 
       <div style={groupStyle}>
