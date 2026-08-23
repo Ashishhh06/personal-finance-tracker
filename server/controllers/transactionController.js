@@ -1,5 +1,8 @@
 const Transaction = require('../models/Transaction');
 const getDateRangeForPeriod = require('../utils/dateRangeHelper');
+const { callLLM } = require('../services/aiService');
+const { matchKeyword } = require('../utils/keywordCategoryMap');
+const Category = require('../models/Category');
 
 // GET /api/transactions?type=&period=&category=&tags=&search=&startDate=&endDate=
 const getTransactions = async (req, res) => {
@@ -147,10 +150,59 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
+
+// POST /api/transactions/auto-categorize
+const autoCategorize = async (req, res) => {
+  try {
+    const { note } = req.body;
+
+    if (!note || note.trim().length < 2) {
+      return res.status(200).json({ category: null, confidence: 0, source: 'none' });
+    }
+
+    const keywordMatch = matchKeyword(note);
+    if (keywordMatch) {
+      return res.status(200).json({ category: keywordMatch, confidence: 90, source: 'keyword' });
+    }
+
+    const categories = await Category.find({
+      type: 'expense',
+      $or: [{ userId: null }, { userId: req.user._id }],
+    });
+    const categoryNames = categories.map((c) => c.name);
+
+    const systemPrompt = `You are a transaction categorization assistant. Given a transaction note/merchant name and a list of available categories, return ONLY a JSON object with this exact format, nothing else, no markdown, no explanation:
+{"category": "<best matching category from the list>", "confidence": <0-100>}
+If nothing matches well, return {"category": "Miscellaneous", "confidence": 0}`;
+
+    const userPrompt = `Transaction note: "${note}"\nAvailable categories: ${categoryNames.join(', ')}`;
+
+    const llmResponse = await callLLM(systemPrompt, userPrompt);
+
+    let parsed;
+    try {
+      const cleaned = llmResponse.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(cleaned);
+    } catch (parseErr) {
+      return res.status(200).json({ category: 'Miscellaneous', confidence: 0, source: 'ai_parse_failed' });
+    }
+
+    return res.status(200).json({
+      category: parsed.category || 'Miscellaneous',
+      confidence: parsed.confidence ?? 0,
+      source: 'ai',
+    });
+  } catch (error) {
+    console.error('Auto-categorize failed:', error.message);
+    return res.status(200).json({ category: null, confidence: 0, source: 'error' });
+  }
+};
+
 module.exports = {
   getTransactions,
   getTransactionById,
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  autoCategorize,
 };
