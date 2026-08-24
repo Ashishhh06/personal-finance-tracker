@@ -6,6 +6,7 @@ import TimePeriodSelector from '../../components/common/TimePeriodSelector';
 import Card from '../../components/common/Card';
 import Spinner from '../../components/common/Spinner';
 import { getNetWorth } from '../../services/netWorthService';
+import { getInsights } from '../../services/insightService';
 
 const COLORS = ['#4f46e5', '#f59e0b', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#e11d48', '#0284c7'];
 
@@ -19,18 +20,23 @@ const Dashboard = () => {
   const fetchSummary = async () => {
     setLoading(true);
     try {
-      const [summaryRes, netWorthRes] = await Promise.all([
+      const [summaryRes, netWorthRes, insightsRes] = await Promise.all([
         getDashboardSummary(period),
         getNetWorth(),
+        getInsights(),
       ]);
-      setData({ ...summaryRes.data, netWorth: netWorthRes.data.netWorth });
+      setData({
+        ...summaryRes.data,
+        netWorth: netWorthRes.data.netWorth,
+        latestInsight: insightsRes.data[0] || null,
+      });
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-  fetchSummary();
+    fetchSummary();
   }, [period]);
 
   if (loading || !data) {
@@ -150,9 +156,26 @@ const Dashboard = () => {
           ₹{data.netWorth?.toLocaleString() ?? '—'}
         </p>
       </Card>
-      <div style={{ marginTop: '1rem', padding: '1rem', color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center' }}>
-        Budget highlights, active goals, and AI insights will appear here in later steps.
-      </div>
+      {data.latestInsight ? (
+      <Card style={{ marginTop: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <p style={{ fontWeight: 600, margin: 0 }}>✨ Latest AI Insight</p>
+          <a href="/insights" style={{ fontSize: '0.85rem', color: '#4f46e5' }}>View all →</a>
+        </div>
+        <p style={{ whiteSpace: 'pre-line', margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
+          {data.latestInsight.message}
+        </p>
+      </Card>
+    ) : (
+      <Card style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <p style={{ color: '#6b7280', margin: 0 }}>
+          No AI insights yet — <a href="/insights" style={{ color: '#4f46e5' }}>generate one</a>
+        </p>
+      </Card>
+    )}
+    <div style={{ marginTop: '1rem', padding: '1rem', color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center' }}>
+      Budget highlights and active goals will appear here in later steps.
+    </div>
     </div>
   );
 };
