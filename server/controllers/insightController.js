@@ -67,7 +67,7 @@ const generateGoalInsight = async (req, res) => {
       return res.status(404).json({ message: 'Goal not found' });
     }
 
-    const systemPrompt = `You are a financial coach. Given a savings goal and the user's real spending/saving data, suggest 1-2 realistic, specific ways to help them hit their goal on time. Reference actual numbers and categories from the data. Keep it under 80 words. Be encouraging but honest. Do not invent any numbers not present in the data.`;
+    const systemPrompt = `You are a financial coach. Given a savings goal and the user's real spending/saving data, suggest 1-2 realistic, specific ways to help them hit their goal on time. Reference actual numbers and categories from the data. Keep it under 60 words and always end with a complete sentence. Be encouraging but honest. Do not invent any numbers not present in the data.`;
 
     const userPrompt = `Goal: "${context.goalName}"
     Target amount: ₹${context.targetAmount}

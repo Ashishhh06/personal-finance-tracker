@@ -8,7 +8,7 @@ const callLLM = async (systemPrompt, userPrompt) => {
       },
       body: JSON.stringify({
         model: 'openai/gpt-oss-20b',
-        max_tokens: 500,
+        max_tokens: 300,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
