@@ -1,5 +1,5 @@
 const AIInsight = require('../models/AIInsight');
-const { computeSpendingAggregates } = require('../services/insightService');
+const { computeSpendingAggregates, computeGoalContext } = require('../services/insightService');
 const { callLLM } = require('../services/aiService');
 const Transaction = require('../models/Transaction');
 
@@ -55,4 +55,50 @@ Unusual transactions flagged (amount significantly above that category's recent 
   }
 };
 
-module.exports = { getInsights, generateInsight };
+
+// POST /api/insights/goals/:goalId/generate
+const generateGoalInsight = async (req, res) => {
+  try {
+    const { goalId } = req.params;
+    let context;
+    try {
+      context = await computeGoalContext(req.user._id, goalId);
+    } catch (err) {
+      return res.status(404).json({ message: 'Goal not found' });
+    }
+
+    const systemPrompt = `You are a financial coach. Given a savings goal and the user's real spending/saving data, suggest 1-2 realistic, specific ways to help them hit their goal on time. Reference actual numbers and categories from the data. Keep it under 80 words. Be encouraging but honest. Do not invent any numbers not present in the data.`;
+
+    const userPrompt = `Goal: "${context.goalName}"
+    Target amount: ₹${context.targetAmount}
+    Currently saved: ₹${context.currentSavedAmount}
+    Months remaining until deadline: ${context.monthsRemaining}
+    Required monthly saving to hit the goal: ₹${context.requiredMonthlySaving}
+    User's actual average monthly saving rate (last 3 months): ₹${context.avgMonthlySavingRate}
+    Top 3 discretionary spending categories this month: ${JSON.stringify(context.topCategories)}`;
+
+    let message;
+    try {
+      message = await callLLM(systemPrompt, userPrompt);
+    } catch (llmError) {
+      return res.status(200).json({
+        message: 'Saving tips are temporarily unavailable. Please try again in a moment.',
+        generated: false,
+      });
+    }
+
+    const insight = await AIInsight.create({
+      userId: req.user._id,
+      type: 'saving_tip',
+      message,
+      relatedModule: 'saving',
+      periodContext: goalId,
+    });
+
+    res.status(201).json(insight);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to generate goal insight', error: error.message });
+  }
+};
+
+module.exports = { getInsights, generateInsight, generateGoalInsight };
