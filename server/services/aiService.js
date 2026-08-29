@@ -8,7 +8,7 @@ const callLLM = async (systemPrompt, userPrompt) => {
       },
       body: JSON.stringify({
         model: 'openai/gpt-oss-20b',
-        max_tokens: 300,
+        max_tokens: 700,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -22,7 +22,13 @@ const callLLM = async (systemPrompt, userPrompt) => {
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    const content = data.choices[0].message.content;
+
+    if (!content || content.trim().length === 0) {
+      throw new Error('LLM returned empty content (likely ran out of tokens during reasoning)');
+    }
+
+    return content;
   } catch (error) {
     console.error('LLM call failed:', error.message);
     throw error;

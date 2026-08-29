@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
-const { getInsights, generateInsight, generateGoalInsight } = require('../controllers/insightController');
+const { getInsights, generateInsight, generateGoalInsight, askQuestion } = require('../controllers/insightController');
 const { protect } = require('../middleware/authMiddleware');
 
 const generateLimiter = rateLimit({
@@ -13,5 +13,6 @@ const generateLimiter = rateLimit({
 router.get('/', protect, getInsights);
 router.post('/generate', protect, generateLimiter, generateInsight);
 router.post('/goals/:goalId/generate', protect, generateLimiter, generateGoalInsight);
+router.post('/ask', protect, generateLimiter, askQuestion);
 
 module.exports = router;
