@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getInsights, generateInsight } from '../../services/insightService';
+import { getInsights, generateInsight, askQuestion } from '../../services/insightService';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Spinner from '../../components/common/Spinner';
@@ -11,6 +11,9 @@ const InsightsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [qaHistory, setQaHistory] = useState([]);
+  const [asking, setAsking] = useState(false);
 
   const fetchInsights = async () => {
     setLoading(true);
@@ -39,6 +42,27 @@ const InsightsPage = () => {
       alert('Failed to generate insight. Please try again.');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleAskQuestion = async (e) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+
+    setAsking(true);
+    const currentQuestion = question;
+    setQuestion('');
+
+    try {
+      const res = await askQuestion(currentQuestion);
+      setQaHistory((prev) => [...prev, { question: currentQuestion, answer: res.data.answer }]);
+    } catch (err) {
+      setQaHistory((prev) => [
+        ...prev,
+        { question: currentQuestion, answer: "Sorry, I couldn't answer that. Please try rephrasing." },
+      ]);
+    } finally {
+      setAsking(false);
     }
   };
 
@@ -85,6 +109,37 @@ const InsightsPage = () => {
           ))}
         </div>
       )}
+
+      <Card style={{ marginTop: '2rem' }}>
+        <h3 style={{ marginBottom: '1rem' }}>💬 Ask a Question</h3>
+
+        {qaHistory.length > 0 && (
+          <div style={{ marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+            {qaHistory.map((qa, idx) => (
+              <div key={idx} style={{ marginBottom: '1rem' }}>
+                <p style={{ fontWeight: 600, margin: '0 0 0.25rem 0' }}>You: {qa.question}</p>
+                <p style={{ margin: 0, color: '#374151', background: '#f5f3ff', padding: '0.6rem 0.8rem', borderRadius: '8px' }}>
+                  {qa.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleAskQuestion} style={{ display: 'flex', gap: '0.5rem' }}>
+          <input
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="e.g. How much did I spend on food last month?"
+            style={{ flex: 1, padding: '0.6rem' }}
+            disabled={asking}
+          />
+          <Button type="submit" disabled={asking || !question.trim()}>
+            {asking ? 'Thinking...' : 'Ask'}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 };
