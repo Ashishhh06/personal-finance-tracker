@@ -19,6 +19,7 @@ import BankAccountsList from './pages/BankAccounts/BankAccountsList';
 import InsightsPage from './pages/Insights/InsightsPage';
 import Settings from './pages/Settings/Settings';
 import BudgetHistory from './pages/Budget/BudgetHistory';
+import LandingPage from './pages/Landing/LandingPage';
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
             <Route path="/settings" element={<Settings />} />
           </Route>
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

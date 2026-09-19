@@ -74,33 +74,42 @@ const IncomeList = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Income</h1>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+      {/* Page header */}
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Income</h1>
+        <div className="flex gap-sm">
           <Button variant="secondary" onClick={() => window.location.href = '/income/compare'}>
             Income vs Expense
           </Button>
-          <Button onClick={handleAdd}>+ Add Income</Button>
+          <Button onClick={handleAdd}>
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Add Income
+          </Button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      {/* Filters row */}
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
         <TimePeriodSelector value={period} onChange={setPeriod} />
-        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ padding: '0.5rem' }}
-          />
+        <form onSubmit={handleSearchSubmit} className="flex gap-sm items-center">
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-secondary text-[18px]">search</span>
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 pr-3 py-2 border border-outline-variant rounded-lg text-label-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container"
+            />
+          </div>
           <Button type="submit" variant="secondary">Search</Button>
         </form>
       </div>
 
-      <Card style={{ marginBottom: '1.5rem' }}>
-        <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>Total for this period</p>
-        <p style={{ fontSize: '1.8rem', fontWeight: 700, color: '#16a34a' }}>₹{total.toLocaleString()}</p>
+      {/* Summary card */}
+      <Card className="mb-md">
+        <p className="text-label-md font-label-md text-secondary">Total for this period</p>
+        <p className="text-stat-lg font-stat-lg text-[#16a34a]">₹{total.toLocaleString()}</p>
       </Card>
 
       {loading ? (
@@ -111,33 +120,49 @@ const IncomeList = () => {
         <EmptyState message="No income entries found for this period." actionLabel="Add your first income" onAction={handleAdd} />
       ) : (
         <Card>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>
-                <th style={{ padding: '0.5rem' }}>Date</th>
-                <th style={{ padding: '0.5rem' }}>Source</th>
-                <th style={{ padding: '0.5rem' }}>Note</th>
-                <th style={{ padding: '0.5rem' }}>Payment</th>
-                <th style={{ padding: '0.5rem', textAlign: 'right' }}>Amount</th>
-                <th style={{ padding: '0.5rem' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((t) => (
-                <tr key={t._id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: '0.5rem' }}>{new Date(t.date).toLocaleDateString()}</td>
-                  <td style={{ padding: '0.5rem' }}>{t.categoryId?.name || '-'}</td>
-                  <td style={{ padding: '0.5rem' }}>{t.note}</td>
-                  <td style={{ padding: '0.5rem' }}>{t.paymentMethod}</td>
-                  <td style={{ padding: '0.5rem', textAlign: 'right', color: '#16a34a' }}>₹{t.amount.toLocaleString()}</td>
-                  <td style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                    <Button variant="secondary" onClick={() => handleEdit(t)}>Edit</Button>
-                    <Button variant="danger" onClick={() => handleDelete(t._id)}>Delete</Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-body-md font-body-md">
+              <thead>
+                <tr className="border-b border-surface-container-high">
+                  <th className="px-sm py-2 text-left text-label-sm font-label-sm text-secondary">Date</th>
+                  <th className="px-sm py-2 text-left text-label-sm font-label-sm text-secondary">Source</th>
+                  <th className="px-sm py-2 text-left text-label-sm font-label-sm text-secondary">Note</th>
+                  <th className="px-sm py-2 text-left text-label-sm font-label-sm text-secondary">Payment</th>
+                  <th className="px-sm py-2 text-right text-label-sm font-label-sm text-secondary">Amount</th>
+                  <th className="px-sm py-2"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {transactions.map((t) => (
+                  <tr key={t._id} className="border-b border-surface-container-low hover:bg-surface-container-low/50 transition-colors">
+                    <td className="px-sm py-3 text-label-md font-label-md text-secondary whitespace-nowrap">{new Date(t.date).toLocaleDateString()}</td>
+                    <td className="px-sm py-3 text-on-surface">{t.categoryId?.name || '-'}</td>
+                    <td className="px-sm py-3 text-on-surface">{t.note}</td>
+                    <td className="px-sm py-3 text-on-surface">{t.paymentMethod}</td>
+                    <td className="px-sm py-3 text-right font-semibold text-[#16a34a]">₹{t.amount.toLocaleString()}</td>
+                    <td className="px-sm py-3">
+                      <div className="flex gap-xs">
+                        <button
+                          onClick={() => handleEdit(t)}
+                          className="p-1 rounded-lg text-secondary hover:text-primary-container hover:bg-primary-fixed/20 transition-colors"
+                          title="Edit"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(t._id)}
+                          className="p-1 rounded-lg text-secondary hover:text-[#dc2626] hover:bg-[#dc2626]/10 transition-colors"
+                          title="Delete"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
 

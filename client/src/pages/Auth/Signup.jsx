@@ -32,49 +32,80 @@ const Signup = () => {
     }
   };
 
+  const inputCls = 'w-full mt-xs px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container';
+  const labelCls = 'block text-label-md font-label-md text-on-surface-variant';
+
   return (
-    <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem' }}>
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            style={{ width: '100%', padding: '0.5rem' }}
-          />
+    <div className="min-h-screen bg-surface flex items-center justify-center p-margin-mobile">
+      <div className="w-full max-w-[420px] bg-surface-container-lowest rounded-xl p-md card-shadow">
+        <div className="flex items-center gap-3 mb-md">
+          <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary font-bold text-lg">
+            F
+          </div>
+          <div>
+            <h1 className="text-headline-md font-headline-md text-on-surface leading-tight">FinTrack</h1>
+            <p className="text-label-sm font-label-sm text-secondary">Personal Finance</p>
+          </div>
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: '0.5rem' }}
-          />
-        </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            style={{ width: '100%', padding: '0.5rem' }}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.75rem' }}>
-          {loading ? 'Signing up...' : 'Sign Up'}
-        </button>
-      </form>
-      <p style={{ marginTop: '1rem' }}>
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
+
+        <h2 className="text-headline-md font-headline-md text-on-surface mb-md">Sign Up</h2>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-sm">
+          <div>
+            <label className={labelCls}>Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="Your full name"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@example.com"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="At least 6 characters"
+              className={inputCls}
+            />
+          </div>
+
+          {error && (
+            <p className="text-label-sm font-label-sm text-[#dc2626]">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-[44px] bg-primary-container text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer mt-xs"
+          >
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p className="mt-md text-label-md font-label-md text-secondary text-center">
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary-container font-semibold hover:underline">
+            Log in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

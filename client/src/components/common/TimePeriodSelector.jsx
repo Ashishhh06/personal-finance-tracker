@@ -2,21 +2,16 @@ const periods = ['day', 'week', 'month', 'year'];
 
 const TimePeriodSelector = ({ value, onChange }) => {
   return (
-    <div style={{ display: 'inline-flex', background: '#e5e7eb', borderRadius: '8px', padding: '4px' }}>
+    <div className="inline-flex bg-surface-container-high rounded-full p-1">
       {periods.map((p) => (
         <button
           key={p}
           onClick={() => onChange(p)}
-          style={{
-            padding: '0.4rem 1rem',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            textTransform: 'capitalize',
-            fontWeight: value === p ? 600 : 400,
-            background: value === p ? '#4f46e5' : 'transparent',
-            color: value === p ? '#fff' : '#374151',
-          }}
+          className={`px-4 py-1.5 rounded-full text-label-md font-label-md capitalize transition-colors ${
+            value === p
+              ? 'bg-surface-container-lowest text-on-surface shadow-sm font-semibold'
+              : 'text-secondary hover:text-on-surface'
+          }`}
         >
           {p}
         </button>

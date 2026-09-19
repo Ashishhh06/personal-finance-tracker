@@ -30,9 +30,6 @@ const InvestmentForm = ({ existingInvestment, onSuccess, onCancel }) => {
   const showQuantity = ['mutual_fund', 'stock', 'crypto'].includes(investmentType);
   const showCurrentPrice = ['mutual_fund', 'stock', 'crypto', 'bond'].includes(investmentType);
 
-  const inputStyle = { width: '100%', padding: '0.5rem', marginTop: '0.25rem' };
-  const groupStyle = { marginBottom: '1rem' };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -63,14 +60,18 @@ const InvestmentForm = ({ existingInvestment, onSuccess, onCancel }) => {
     }
   };
 
+  const inputCls = 'w-full mt-xs px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container';
+  const labelCls = 'block text-label-md font-label-md text-on-surface-variant';
+  const groupCls = 'mb-sm';
+
   return (
     <form onSubmit={handleSubmit}>
-      <div style={groupStyle}>
-        <label>Type</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Type</label>
         <select
           value={investmentType}
           onChange={(e) => setInvestmentType(e.target.value)}
-          style={inputStyle}
+          className={inputCls}
         >
           {Object.entries(TYPE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
@@ -78,96 +79,96 @@ const InvestmentForm = ({ existingInvestment, onSuccess, onCancel }) => {
         </select>
       </div>
 
-      <div style={groupStyle}>
-        <label>{isFD ? 'Bank Name' : 'Name'}</label>
+      <div className={groupCls}>
+        <label className={labelCls}>{isFD ? 'Bank Name' : 'Name'}</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={isFD ? 'e.g. HDFC Bank' : 'e.g. Reliance Industries'}
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
       {showQuantity && (
-        <div style={groupStyle}>
-          <label>Quantity / Units</label>
+        <div className={groupCls}>
+          <label className={labelCls}>Quantity / Units</label>
           <input
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             min="0"
             step="0.0001"
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>{isFD ? 'Principal Amount' : 'Purchase Price (per unit)'}</label>
+      <div className={groupCls}>
+        <label className={labelCls}>{isFD ? 'Principal Amount' : 'Purchase Price (per unit)'}</label>
         <input
           type="number"
           value={purchasePrice}
           onChange={(e) => setPurchasePrice(e.target.value)}
           required
           min="0"
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
       {showCurrentPrice && (
-        <div style={groupStyle}>
-          <label>Current Price (per unit)</label>
+        <div className={groupCls}>
+          <label className={labelCls}>Current Price (per unit)</label>
           <input
             type="number"
             value={currentPrice}
             onChange={(e) => setCurrentPrice(e.target.value)}
             min="0"
-            style={inputStyle}
+            className={inputCls}
           />
         </div>
       )}
 
       {isFD && (
         <>
-          <div style={groupStyle}>
-            <label>Interest Rate (% per annum)</label>
+          <div className={groupCls}>
+            <label className={labelCls}>Interest Rate (% per annum)</label>
             <input
               type="number"
               value={interestRate}
               onChange={(e) => setInterestRate(e.target.value)}
               min="0"
               step="0.01"
-              style={inputStyle}
+              className={inputCls}
             />
           </div>
-          <div style={groupStyle}>
-            <label>Maturity Date</label>
+          <div className={groupCls}>
+            <label className={labelCls}>Maturity Date</label>
             <input
               type="date"
               value={maturityDate}
               onChange={(e) => setMaturityDate(e.target.value)}
-              style={inputStyle}
+              className={inputCls}
             />
           </div>
         </>
       )}
 
-      <div style={groupStyle}>
-        <label>Purchase Date</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Purchase Date</label>
         <input
           type="date"
           value={purchaseDate}
           onChange={(e) => setPurchaseDate(e.target.value)}
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="mt-xs text-label-sm font-label-sm text-[#dc2626]">{error}</p>}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+      <div className="flex gap-sm mt-md">
         <Button type="submit" disabled={loading}>
           {loading ? 'Saving...' : existingInvestment ? 'Update' : 'Add'} Investment
         </Button>

@@ -13,9 +13,6 @@ const GoalForm = ({ existingGoal, onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const inputStyle = { width: '100%', padding: '0.5rem', marginTop: '0.25rem' };
-  const groupStyle = { marginBottom: '1rem' };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -43,64 +40,68 @@ const GoalForm = ({ existingGoal, onSuccess, onCancel }) => {
     }
   };
 
+  const inputCls = 'w-full mt-xs px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container';
+  const labelCls = 'block text-label-md font-label-md text-on-surface-variant';
+  const groupCls = 'mb-sm';
+
   return (
     <form onSubmit={handleSubmit}>
-      <div style={groupStyle}>
-        <label>Goal Name</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Goal Name</label>
         <input
           type="text"
           value={goalName}
           onChange={(e) => setGoalName(e.target.value)}
           placeholder="e.g. New Laptop"
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
-      <div style={groupStyle}>
-        <label>Target Amount</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Target Amount</label>
         <input
           type="number"
           value={targetAmount}
           onChange={(e) => setTargetAmount(e.target.value)}
           required
           min="0"
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
-      <div style={groupStyle}>
-        <label>Currently Saved</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Currently Saved</label>
         <input
           type="number"
           value={currentSavedAmount}
           onChange={(e) => setCurrentSavedAmount(e.target.value)}
           min="0"
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
-      <div style={groupStyle}>
-        <label>Deadline</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Deadline</label>
         <input
           type="date"
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
-      <div style={groupStyle}>
-        <label>Monthly Contribution (optional)</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Monthly Contribution (optional)</label>
         <input
           type="number"
           value={monthlyContribution}
           onChange={(e) => setMonthlyContribution(e.target.value)}
           min="0"
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="mt-xs text-label-sm font-label-sm text-[#dc2626]">{error}</p>}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+      <div className="flex gap-sm mt-md">
         <Button type="submit" disabled={loading}>
           {loading ? 'Saving...' : existingGoal ? 'Update Goal' : 'Add Goal'}
         </Button>

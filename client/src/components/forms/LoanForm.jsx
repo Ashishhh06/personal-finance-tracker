@@ -22,9 +22,6 @@ const LoanForm = ({ existingLoan, onSuccess, onCancel }) => {
 
   const isDebt = loanType === 'debt';
 
-  const inputStyle = { width: '100%', padding: '0.5rem', marginTop: '0.25rem' };
-  const groupStyle = { marginBottom: '1rem' };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -57,11 +54,15 @@ const LoanForm = ({ existingLoan, onSuccess, onCancel }) => {
     }
   };
 
+  const inputCls = 'w-full mt-xs px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container';
+  const labelCls = 'block text-label-md font-label-md text-on-surface-variant';
+  const groupCls = 'mb-sm';
+
   return (
     <form onSubmit={handleSubmit}>
-      <div style={groupStyle}>
-        <label>Type</label>
-        <select value={loanType} onChange={(e) => setLoanType(e.target.value)} style={inputStyle}>
+      <div className={groupCls}>
+        <label className={labelCls}>Type</label>
+        <select value={loanType} onChange={(e) => setLoanType(e.target.value)} className={inputCls}>
           <option value="home">Home Loan</option>
           <option value="car">Car Loan</option>
           <option value="personal">Personal Loan</option>
@@ -72,77 +73,77 @@ const LoanForm = ({ existingLoan, onSuccess, onCancel }) => {
       </div>
 
       {isDebt && (
-        <div style={groupStyle}>
-          <label>Direction</label>
-          <select value={direction} onChange={(e) => setDirection(e.target.value)} style={inputStyle}>
+        <div className={groupCls}>
+          <label className={labelCls}>Direction</label>
+          <select value={direction} onChange={(e) => setDirection(e.target.value)} className={inputCls}>
             <option value="owed_by_me">I owe them (I borrowed)</option>
             <option value="owed_to_me">They owe me (I lent)</option>
           </select>
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>{isDebt ? "Person's Name" : 'Lender Name'}</label>
+      <div className={groupCls}>
+        <label className={labelCls}>{isDebt ? "Person's Name" : 'Lender Name'}</label>
         <input
           type="text"
           value={lenderName}
           onChange={(e) => setLenderName(e.target.value)}
           placeholder={isDebt ? 'e.g. Rahul' : 'e.g. ICICI Bank'}
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      <div style={groupStyle}>
-        <label>{isDebt ? 'Amount' : 'Principal Amount'}</label>
-        <input type="number" value={principalAmount} onChange={(e) => setPrincipalAmount(e.target.value)} required min="0" style={inputStyle} />
+      <div className={groupCls}>
+        <label className={labelCls}>{isDebt ? 'Amount' : 'Principal Amount'}</label>
+        <input type="number" value={principalAmount} onChange={(e) => setPrincipalAmount(e.target.value)} required min="0" className={inputCls} />
       </div>
 
       {!isDebt && (
-        <div style={groupStyle}>
-          <label>EMI Amount</label>
-          <input type="number" value={emiAmount} onChange={(e) => setEmiAmount(e.target.value)} min="0" style={inputStyle} />
+        <div className={groupCls}>
+          <label className={labelCls}>EMI Amount</label>
+          <input type="number" value={emiAmount} onChange={(e) => setEmiAmount(e.target.value)} min="0" className={inputCls} />
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>Interest Rate (% per annum, optional)</label>
-        <input type="number" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} min="0" step="0.01" style={inputStyle} />
+      <div className={groupCls}>
+        <label className={labelCls}>Interest Rate (% per annum, optional)</label>
+        <input type="number" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} min="0" step="0.01" className={inputCls} />
       </div>
 
       {!isDebt && (
-        <div style={groupStyle}>
-          <label>Tenure (months)</label>
-          <input type="number" value={tenureMonths} onChange={(e) => setTenureMonths(e.target.value)} min="1" style={inputStyle} />
+        <div className={groupCls}>
+          <label className={labelCls}>Tenure (months)</label>
+          <input type="number" value={tenureMonths} onChange={(e) => setTenureMonths(e.target.value)} min="1" className={inputCls} />
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>Start Date</label>
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required style={inputStyle} />
+      <div className={groupCls}>
+        <label className={labelCls}>Start Date</label>
+        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className={inputCls} />
       </div>
 
       {!isDebt && (
-        <div style={groupStyle}>
-          <label>Next Due Date</label>
-          <input type="date" value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} style={inputStyle} />
+        <div className={groupCls}>
+          <label className={labelCls}>Next Due Date</label>
+          <input type="date" value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} className={inputCls} />
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>Note (optional)</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Note (optional)</label>
         <input
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder={isDebt ? 'e.g. lent for bike repair' : 'any additional details'}
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="mt-xs text-label-sm font-label-sm text-[#dc2626]">{error}</p>}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+      <div className="flex gap-sm mt-md">
         <Button type="submit" disabled={loading}>{loading ? 'Saving...' : existingLoan ? 'Update' : 'Add'}</Button>
         <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
       </div>

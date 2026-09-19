@@ -1,8 +1,8 @@
-const Button = ({ children, onClick, type = 'button', variant = 'primary', disabled = false, style = {} }) => {
+const Button = ({ children, onClick, type = 'button', variant = 'primary', disabled = false, className = '' }) => {
   const variants = {
-    primary: { background: '#4f46e5', color: '#fff' },
-    danger: { background: '#dc2626', color: '#fff' },
-    secondary: { background: '#e5e7eb', color: '#111' },
+    primary: 'bg-primary-container text-on-primary hover:bg-primary shadow-sm',
+    danger: 'bg-error text-on-error hover:bg-error/90 shadow-sm',
+    secondary: 'bg-surface-container text-on-surface hover:bg-surface-container-high',
   };
 
   return (
@@ -10,16 +10,9 @@ const Button = ({ children, onClick, type = 'button', variant = 'primary', disab
       type={type}
       onClick={onClick}
       disabled={disabled}
-      style={{
-        padding: '0.6rem 1.2rem',
-        border: 'none',
-        borderRadius: '6px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1,
-        fontWeight: 500,
-        ...variants[variant],
-        ...style,
-      }}
+      className={`h-[44px] px-md rounded-lg font-label-md text-label-md flex items-center gap-1 transition-colors ${
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+      } ${variants[variant]} ${className}`}
     >
       {children}
     </button>

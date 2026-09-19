@@ -1,25 +1,26 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard' },
-  { path: '/expenses', label: 'Expenses' },
-  { path: '/income', label: 'Income' },
-  { path: '/goals', label: 'Goals' },
-  { path: '/investments', label: 'Investments' },
-  { path: '/budget', label: 'Budget' },
-  { path: '/lifestyle', label: 'Lifestyle' },
-  { path: '/networth', label: 'Net Worth' },
-  { path: '/loans', label: 'Loans' },
-  { path: '/bank-accounts', label: 'Bank Accounts' },
-  { path: '/insights', label: 'AI Insights' },
-  { path: '/settings', label: 'Settings' },
+  { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { path: '/expenses', label: 'Expenses', icon: 'payments' },
+  { path: '/income', label: 'Income', icon: 'trending_up' },
+  { path: '/goals', label: 'Goals', icon: 'target' },
+  { path: '/investments', label: 'Investments', icon: 'account_balance_wallet' },
+  { path: '/budget', label: 'Budget', icon: 'receipt_long' },
+  { path: '/lifestyle', label: 'Lifestyle', icon: 'style' },
+  { path: '/networth', label: 'Net Worth', icon: 'monitoring' },
+  { path: '/loans', label: 'Loans & Debts', icon: 'credit_card' },
+  { path: '/bank-accounts', label: 'Bank Accounts', icon: 'account_balance' },
+  { path: '/insights', label: 'AI Insights', icon: 'psychology' },
+  { path: '/settings', label: 'Settings', icon: 'settings' },
 ];
 
 const Layout = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -27,55 +28,87 @@ const Layout = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <aside
-        style={{
-          width: '220px',
-          background: '#1e1e2f',
-          color: '#fff',
-          padding: '1.5rem 1rem',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+    <div className="flex min-h-screen bg-[#f5f5f7]">
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* SideNavBar */}
+      <nav
+        className={`fixed left-0 top-0 h-full w-[280px] bg-inverse-surface flex flex-col py-md shadow-sm z-50 transition-transform duration-200 md:translate-x-0 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        <h2 style={{ marginBottom: '2rem', fontSize: '1.2rem' }}>FinTrack</h2>
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="px-gutter mb-lg flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary font-bold text-lg">
+            F
+          </div>
+          <div>
+            <h1 className="text-headline-md font-headline-md font-extrabold text-on-primary-fixed leading-tight">
+              FinTrack
+            </h1>
+            <p className="text-label-sm font-label-sm text-surface-variant/70">Personal Finance</p>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-sm flex flex-col gap-1 sidebar-scroll">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              style={({ isActive }) => ({
-                padding: '0.6rem 0.8rem',
-                borderRadius: '6px',
-                color: '#fff',
-                textDecoration: 'none',
-                background: isActive ? '#4f46e5' : 'transparent',
-              })}
+              onClick={() => setMobileOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 text-label-md font-label-md ${
+                  isActive
+                    ? 'text-on-primary-fixed font-bold border-l-4 border-primary-container bg-surface-variant/10'
+                    : 'text-surface-variant hover:text-on-primary-fixed hover:bg-surface-variant/20'
+                }`
+              }
             >
-              {item.label}
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span>{item.label}</span>
             </NavLink>
           ))}
-        </nav>
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #333' }}>
-          <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>{user?.name}</p>
+        </div>
+
+        <div className="px-sm mt-auto pt-sm border-t border-surface-variant/20">
+          <div className="px-3 py-2 text-surface-variant text-label-sm font-label-sm truncate">
+            {user?.name}
+          </div>
           <button
             onClick={handleLogout}
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              background: '#dc2626',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-error hover:bg-error/10 transition-colors duration-200 text-label-md font-label-md"
           >
-            Logout
+            <span className="material-symbols-outlined">logout</span>
+            <span>Logout</span>
           </button>
         </div>
-      </aside>
-      <main style={{ flex: 1, padding: '2rem', background: '#f5f5f7' }}>
-        <Outlet />
+      </nav>
+
+      {/* Main Content Wrapper */}
+      <main className="flex-1 md:ml-[280px] w-full flex flex-col">
+        {/* TopAppBar */}
+        <header className="bg-surface flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-base sticky top-0 z-30 shadow-sm md:shadow-none">
+          <button
+            className="md:hidden text-primary p-2 rounded hover:bg-surface-variant/20 transition-colors"
+            onClick={() => setMobileOpen(true)}
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <h2 className="text-headline-md font-headline-md font-extrabold text-primary md:hidden">
+            FinTrack
+          </h2>
+
+        </header>
+
+        {/* Page Content Canvas */}
+        <div className="flex-1 p-margin-mobile md:p-margin-desktop max-w-7xl mx-auto w-full">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

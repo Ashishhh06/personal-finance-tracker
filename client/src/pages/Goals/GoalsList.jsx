@@ -27,41 +27,37 @@ const GoalCard = ({ goal, onEdit, onDelete, isCompleted }) => {
 
   return (
     <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-        <h3 style={{ margin: 0 }}>{goal.goalName}</h3>
+      <div className="flex justify-between items-start gap-xs mb-xs">
+        <h3 className="text-headline-md font-headline-md text-on-surface leading-snug">{goal.goalName}</h3>
         {isCompleted && (
-          <span style={{ background: '#dcfce7', color: '#16a34a', padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
+          <span className="bg-[#16a34a]/10 text-[#16a34a] px-2.5 py-0.5 rounded-full text-label-sm font-semibold shrink-0">
             ✓ Completed
           </span>
         )}
       </div>
-      <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0.5rem 0' }}>
+      <p className="text-label-sm font-label-sm text-secondary mb-sm">
         Deadline: {new Date(goal.deadline).toLocaleDateString()}
       </p>
 
-      <div style={{ background: '#e5e7eb', borderRadius: '8px', height: '10px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+      <div className="bg-surface-container-high rounded-full h-2.5 overflow-hidden mb-xs">
         <div
-          style={{
-            width: `${goal.progressPercent}%`,
-            background: isCompleted ? '#16a34a' : '#4f46e5',
-            height: '100%',
-            transition: 'width 0.3s',
-          }}
+          className={`h-full transition-all duration-300 ${isCompleted ? 'bg-[#16a34a]' : 'bg-primary-container'}`}
+          style={{ width: `${Math.min(100, goal.progressPercent)}%` }}
         />
       </div>
 
-      <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
+      <p className="text-body-md font-body-md text-on-surface mb-sm">
         ₹{goal.currentSavedAmount.toLocaleString()} / ₹{goal.targetAmount.toLocaleString()} ({goal.progressPercent}%)
       </p>
 
       {tip && (
-        <div style={{ background: '#f5f3ff', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem', lineHeight: 1.5 }}>
-          <p style={{ margin: 0, fontWeight: 600, color: '#4f46e5', marginBottom: '0.25rem' }}>✨ AI Tip</p>
-          <p style={{ margin: 0, whiteSpace: 'pre-line' }}>{tip}</p>
+        <div className="bg-primary-container/10 border border-primary-container/20 p-sm rounded-lg mb-sm text-label-md leading-relaxed">
+          <p className="font-semibold text-primary-container mb-xs">✨ AI Tip</p>
+          <p className="text-on-surface whitespace-pre-line">{tip}</p>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <div className="flex gap-xs flex-wrap mt-xs">
         {!isCompleted && (
           <Button variant="secondary" onClick={handleGetTip} disabled={loadingTip}>
             {loadingTip ? 'Thinking...' : '✨ Get Saving Tips'}
@@ -127,23 +123,26 @@ const GoalsList = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Saving Goals</h1>
-        <Button onClick={handleAdd}>+ Add Goal</Button>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Saving Goals</h1>
+        <Button onClick={handleAdd}>
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          Add Goal
+        </Button>
       </div>
 
-      <Card style={{ marginBottom: '1.5rem' }}>
-        <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>Current Total Savings (all-time income − expenses)</p>
-        <p style={{ fontSize: '1.8rem', fontWeight: 700, color: summary.currentTotalSavings >= 0 ? '#16a34a' : '#dc2626' }}>
+      <Card className="mb-md">
+        <p className="text-label-md font-label-md text-secondary">Current Total Savings (all-time income − expenses)</p>
+        <p className={`text-stat-lg font-stat-lg ${summary.currentTotalSavings >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
           ₹{summary.currentTotalSavings.toLocaleString()}
         </p>
       </Card>
 
-      <h3 style={{ marginBottom: '1rem' }}>Active Goals</h3>
+      <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Active Goals</h3>
       {summary.activeGoals.length === 0 ? (
         <EmptyState message="No active goals yet." actionLabel="Add your first goal" onAction={handleAdd} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md mb-lg">
           {summary.activeGoals.map((goal) => (
             <GoalCard key={goal._id} goal={goal} onEdit={handleEdit} onDelete={handleDelete} isCompleted={false} />
           ))}
@@ -151,26 +150,16 @@ const GoalsList = () => {
       )}
 
       {summary.completedGoals.length > 0 && (
-        <div>
+        <div className="mt-md">
           <button
             onClick={() => setShowCompleted(!showCompleted)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 600,
-              marginBottom: '1rem',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
+            className="flex items-center gap-xs font-semibold text-on-surface text-label-md hover:text-primary-container transition-colors mb-sm cursor-pointer"
           >
-            {showCompleted ? '▼' : '▶'} Completed Goals ({summary.completedGoals.length})
+            <span>{showCompleted ? '▼' : '▶'}</span> Completed Goals ({summary.completedGoals.length})
           </button>
 
           {showCompleted && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
               {summary.completedGoals.map((goal) => (
                 <GoalCard key={goal._id} goal={goal} onEdit={handleEdit} onDelete={handleDelete} isCompleted={true} />
               ))}

@@ -8,7 +8,8 @@ import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
 import BudgetForm from '../../components/forms/BudgetForm';
 
-const STATUS_COLORS = { green: '#16a34a', yellow: '#f59e0b', red: '#dc2626' };
+const STATUS_BG = { green: 'bg-[#16a34a]', yellow: 'bg-[#f59e0b]', red: 'bg-[#dc2626]' };
+const STATUS_TEXT = { green: 'text-[#16a34a]', yellow: 'text-[#f59e0b]', red: 'text-[#dc2626]' };
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const BudgetOverview = () => {
@@ -53,48 +54,51 @@ const BudgetOverview = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Budget Planner — {MONTH_NAMES[month - 1]} {year}</h1>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Budget Planner — {MONTH_NAMES[month - 1]} {year}</h1>
+        <div className="flex gap-sm">
           <Button variant="secondary" onClick={() => window.location.href = '/budget/history'}>View History</Button>
-          <Button onClick={handleAdd}>+ Set Budget</Button>
+          <Button onClick={handleAdd}>
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Set Budget
+          </Button>
         </div>
       </div>
 
       {statuses.length === 0 ? (
         <EmptyState message="No budgets set for this month." actionLabel="Set your first budget" onAction={handleAdd} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
           {statuses.map((b) => (
             <Card key={b.budgetId}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <h4 style={{ margin: 0 }}>{b.category}</h4>
-                <Button variant="danger" onClick={() => handleDelete(b.budgetId)} style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}>
-                  ✕
-                </Button>
+              <div className="flex justify-between items-start mb-xs">
+                <h4 className="text-headline-md font-headline-md text-on-surface">{b.category}</h4>
+                <button
+                  onClick={() => handleDelete(b.budgetId)}
+                  className="p-1 rounded-lg text-secondary hover:text-[#dc2626] hover:bg-[#dc2626]/10 transition-colors cursor-pointer"
+                  title="Remove budget"
+                >
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
               </div>
 
-              <div style={{ background: '#e5e7eb', borderRadius: '8px', height: '12px', overflow: 'hidden', margin: '0.75rem 0 0.5rem' }}>
+              <div className="bg-surface-container-high rounded-full h-3 overflow-hidden my-sm">
                 <div
-                  style={{
-                    width: `${Math.min(100, b.percentUsed)}%`,
-                    background: STATUS_COLORS[b.status],
-                    height: '100%',
-                    transition: 'width 0.3s',
-                  }}
+                  className={`h-full transition-all duration-300 ${STATUS_BG[b.status] || 'bg-primary-container'}`}
+                  style={{ width: `${Math.min(100, b.percentUsed)}%` }}
                 />
               </div>
 
-              <p style={{ fontSize: '0.9rem', margin: 0 }}>
+              <p className="text-body-md font-body-md text-on-surface">
                 ₹{b.actualSpent.toLocaleString()} of ₹{b.limitAmount.toLocaleString()}
               </p>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: STATUS_COLORS[b.status], margin: '0.25rem 0 0' }}>
+              <p className={`text-label-md font-label-md font-semibold mt-xs ${STATUS_TEXT[b.status] || 'text-secondary'}`}>
                 {b.percentUsed}% used
                 {b.status === 'red' && ' — over budget!'}
                 {b.status === 'yellow' && ' — getting close'}
               </p>
 
-              <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.75rem' }}>
+              <p className="text-label-sm font-label-sm text-secondary mt-sm">
                 {b.limitAmount - b.actualSpent >= 0
                   ? `${daysRemaining} days left, ₹${(b.limitAmount - b.actualSpent).toLocaleString()} left in this budget`
                   : `You're ₹${(b.actualSpent - b.limitAmount).toLocaleString()} over, with ${daysRemaining} days left`}

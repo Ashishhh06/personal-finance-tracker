@@ -99,34 +99,43 @@ const PortfolioOverview = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Investments & Properties</h1>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button variant="secondary" onClick={handleAddProperty}>+ Add Property</Button>
-          <Button onClick={handleAddInvestment}>+ Add Investment</Button>
+      {/* Header */}
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Investments & Properties</h1>
+        <div className="flex gap-sm">
+          <Button variant="secondary" onClick={handleAddProperty}>
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Add Property
+          </Button>
+          <Button onClick={handleAddInvestment}>
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Add Investment
+          </Button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm mb-md">
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Invested</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700 }}>₹{summary.totalInvested.toLocaleString()}</p>
+          <p className="text-label-md font-label-md text-secondary">Total Invested</p>
+          <p className="text-stat-lg font-stat-lg text-on-surface">₹{summary.totalInvested.toLocaleString()}</p>
         </Card>
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Current Value</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700 }}>₹{summary.totalCurrentValue.toLocaleString()}</p>
+          <p className="text-label-md font-label-md text-secondary">Current Value</p>
+          <p className="text-stat-lg font-stat-lg text-on-surface">₹{summary.totalCurrentValue.toLocaleString()}</p>
         </Card>
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Overall Return</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: summary.overallReturnPercent >= 0 ? '#16a34a' : '#dc2626' }}>
+          <p className="text-label-md font-label-md text-secondary">Overall Return</p>
+          <p className={`text-stat-lg font-stat-lg ${summary.overallReturnPercent >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
             {summary.overallReturnPercent >= 0 ? '+' : ''}{summary.overallReturnPercent}%
           </p>
         </Card>
       </div>
 
+      {/* Allocation chart */}
       {chartData.length > 0 && (
-        <Card style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Allocation</h3>
+        <Card className="mb-md">
+          <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Allocation</h3>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85} label>
@@ -141,20 +150,17 @@ const PortfolioOverview = () => {
         </Card>
       )}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+      {/* Filter chips */}
+      <div className="flex gap-xs mb-md flex-wrap">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setActiveFilter(f)}
-            style={{
-              padding: '0.4rem 0.9rem',
-              borderRadius: '999px',
-              border: 'none',
-              cursor: 'pointer',
-              background: activeFilter === f ? '#4f46e5' : '#e5e7eb',
-              color: activeFilter === f ? '#fff' : '#374151',
-              fontSize: '0.85rem',
-            }}
+            className={`px-3 py-1.5 rounded-full text-label-md font-label-md transition-colors cursor-pointer ${
+              activeFilter === f
+                ? 'bg-primary-container text-on-primary font-semibold shadow-sm'
+                : 'bg-surface-container-high text-secondary hover:text-on-surface'
+            }`}
           >
             {f === 'all' ? 'All' : TYPE_LABELS[f]}
           </button>
@@ -164,68 +170,73 @@ const PortfolioOverview = () => {
       {investments.length === 0 ? (
         <EmptyState message="No investments yet." actionLabel="Add your first investment" onAction={handleAddInvestment} />
       ) : (
-        <Card style={{ marginBottom: '1.5rem' }}>
+        <Card className="mb-md">
           {typesToShow.map((type) => {
             const items = groupedInvestments[type] || [];
             if (items.length === 0) return null;
             const isExpanded = expandedType === type;
 
             return (
-              <div key={type} style={{ marginBottom: '0.5rem' }}>
+              <div key={type} className="mb-xs last:mb-0">
                 <button
                   onClick={() => setExpandedType(isExpanded ? null : type)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    background: '#f9fafb',
-                    border: 'none',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
+                  className="w-full text-left bg-surface-container-low hover:bg-surface-container-high/60 transition-colors px-sm py-2.5 rounded-lg font-semibold text-label-md flex justify-between items-center cursor-pointer mb-xs"
                 >
-                  <span>{isExpanded ? '▼' : '▶'} {TYPE_LABELS[type]} ({items.length})</span>
+                  <span className="text-on-surface">{isExpanded ? '▼' : '▶'} {TYPE_LABELS[type]} ({items.length})</span>
                 </button>
 
                 {isExpanded && (
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '0.5rem' }}>
-                    <thead>
-                      <tr style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>
-                        <th style={{ padding: '0.5rem' }}>Name</th>
-                        <th style={{ padding: '0.5rem', textAlign: 'right' }}>Invested</th>
-                        <th style={{ padding: '0.5rem', textAlign: 'right' }}>Current Value</th>
-                        <th style={{ padding: '0.5rem' }}></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((inv) => {
-                        const invested = inv.investmentType === 'fd'
-                          ? inv.purchasePrice
-                          : inv.purchasePrice * (inv.quantity || 0);
-                        const current = inv.investmentType === 'fd'
-                          ? inv.purchasePrice
-                          : (inv.currentPrice ?? inv.purchasePrice) * (inv.quantity || 0);
-                        const returnPct = invested > 0 ? Math.round(((current - invested) / invested) * 10000) / 100 : 0;
+                  <div className="overflow-x-auto mb-sm">
+                    <table className="w-full text-body-md font-body-md">
+                      <thead>
+                        <tr className="border-b border-surface-container-high">
+                          <th className="px-sm py-2 text-left text-label-sm font-label-sm text-secondary">Name</th>
+                          <th className="px-sm py-2 text-right text-label-sm font-label-sm text-secondary">Invested</th>
+                          <th className="px-sm py-2 text-right text-label-sm font-label-sm text-secondary">Current Value</th>
+                          <th className="px-sm py-2"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((inv) => {
+                          const invested = inv.investmentType === 'fd'
+                            ? inv.purchasePrice
+                            : inv.purchasePrice * (inv.quantity || 0);
+                          const current = inv.investmentType === 'fd'
+                            ? inv.purchasePrice
+                            : (inv.currentPrice ?? inv.purchasePrice) * (inv.quantity || 0);
+                          const returnPct = invested > 0 ? Math.round(((current - invested) / invested) * 10000) / 100 : 0;
 
-                        return (
-                          <tr key={inv._id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                            <td style={{ padding: '0.5rem' }}>{inv.name}</td>
-                            <td style={{ padding: '0.5rem', textAlign: 'right' }}>₹{invested.toLocaleString()}</td>
-                            <td style={{ padding: '0.5rem', textAlign: 'right', color: returnPct >= 0 ? '#16a34a' : '#dc2626' }}>
-                              ₹{current.toLocaleString()} ({returnPct >= 0 ? '+' : ''}{returnPct}%)
-                            </td>
-                            <td style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                              <Button variant="secondary" onClick={() => handleEditInvestment(inv)}>Edit</Button>
-                              <Button variant="danger" onClick={() => handleDeleteInvestment(inv._id)}>Delete</Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                          return (
+                            <tr key={inv._id} className="border-b border-surface-container-low hover:bg-surface-container-low/50 transition-colors">
+                              <td className="px-sm py-2.5 text-on-surface">{inv.name}</td>
+                              <td className="px-sm py-2.5 text-right text-on-surface">₹{invested.toLocaleString()}</td>
+                              <td className={`px-sm py-2.5 text-right font-semibold ${returnPct >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
+                                ₹{current.toLocaleString()} ({returnPct >= 0 ? '+' : ''}{returnPct}%)
+                              </td>
+                              <td className="px-sm py-2.5">
+                                <div className="flex gap-xs justify-end">
+                                  <button
+                                    onClick={() => handleEditInvestment(inv)}
+                                    className="p-1 rounded-lg text-secondary hover:text-primary-container hover:bg-primary-fixed/20 transition-colors"
+                                    title="Edit"
+                                  >
+                                    <span className="material-symbols-outlined text-[20px]">edit</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteInvestment(inv._id)}
+                                    className="p-1 rounded-lg text-secondary hover:text-[#dc2626] hover:bg-[#dc2626]/10 transition-colors"
+                                    title="Delete"
+                                  >
+                                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             );
@@ -233,25 +244,26 @@ const PortfolioOverview = () => {
         </Card>
       )}
 
-      <h3 style={{ marginBottom: '1rem' }}>Properties</h3>
+      {/* Properties section */}
+      <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Properties</h3>
       {properties.length === 0 ? (
         <EmptyState message="No properties added yet." actionLabel="Add a property" onAction={handleAddProperty} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
           {properties.map((p) => {
             const growth = p.currentEstimatedValue - p.purchasePrice;
             const growthPct = p.purchasePrice > 0 ? Math.round((growth / p.purchasePrice) * 10000) / 100 : 0;
             return (
               <Card key={p._id}>
-                <h4 style={{ margin: 0, textTransform: 'capitalize' }}>{p.name}</h4>
-                <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0.25rem 0' }}>{p.propertyType}</p>
-                <p style={{ fontSize: '1.3rem', fontWeight: 700, margin: '0.5rem 0' }}>
+                <h4 className="text-headline-md font-headline-md text-on-surface capitalize">{p.name}</h4>
+                <p className="text-label-sm font-label-sm text-secondary mb-xs capitalize">{p.propertyType}</p>
+                <p className="text-stat-lg font-stat-lg text-on-surface my-xs">
                   ₹{p.currentEstimatedValue.toLocaleString()}
                 </p>
-                <p style={{ color: growthPct >= 0 ? '#16a34a' : '#dc2626', fontSize: '0.85rem' }}>
+                <p className={`text-label-md font-label-md font-semibold ${growthPct >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
                   {growthPct >= 0 ? '+' : ''}{growthPct}% since purchase
                 </p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                <div className="flex gap-xs mt-md">
                   <Button variant="secondary" onClick={() => handleEditProperty(p)}>Edit</Button>
                   <Button variant="danger" onClick={() => handleDeleteProperty(p._id)}>Delete</Button>
                 </div>

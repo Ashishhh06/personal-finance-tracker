@@ -45,8 +45,8 @@ const IncomeVsExpense = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Income vs Expense</h1>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Income vs Expense</h1>
         <TimePeriodSelector value={period} onChange={setPeriod} />
       </div>
 
@@ -54,18 +54,18 @@ const IncomeVsExpense = () => {
         <Spinner />
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm mb-md">
             <Card>
-              <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Income</p>
-              <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#16a34a' }}>₹{income.toLocaleString()}</p>
+              <p className="text-label-md font-label-md text-secondary">Total Income</p>
+              <p className="text-stat-lg font-stat-lg text-[#16a34a]">₹{income.toLocaleString()}</p>
             </Card>
             <Card>
-              <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Expense</p>
-              <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#dc2626' }}>₹{expense.toLocaleString()}</p>
+              <p className="text-label-md font-label-md text-secondary">Total Expense</p>
+              <p className="text-stat-lg font-stat-lg text-[#dc2626]">₹{expense.toLocaleString()}</p>
             </Card>
             <Card>
-              <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Net Savings</p>
-              <p style={{ fontSize: '1.6rem', fontWeight: 700, color: netSavings >= 0 ? '#16a34a' : '#dc2626' }}>
+              <p className="text-label-md font-label-md text-secondary">Net Savings</p>
+              <p className={`text-stat-lg font-stat-lg ${netSavings >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
                 ₹{netSavings.toLocaleString()}
               </p>
             </Card>

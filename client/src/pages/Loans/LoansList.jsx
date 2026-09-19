@@ -71,26 +71,29 @@ const LoansList = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Loans & Debts</h1>
-        <Button onClick={handleAdd}>+ Add</Button>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Loans & Debts</h1>
+        <Button onClick={handleAdd}>
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          Add
+        </Button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm mb-md">
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>You Owe</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#dc2626' }}>₹{summary.totalOwedByMe.toLocaleString()}</p>
+          <p className="text-label-md font-label-md text-secondary">You Owe</p>
+          <p className="text-stat-lg font-stat-lg text-[#dc2626]">₹{summary.totalOwedByMe.toLocaleString()}</p>
         </Card>
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Owed to You</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#16a34a' }}>₹{summary.totalOwedToMe.toLocaleString()}</p>
+          <p className="text-label-md font-label-md text-secondary">Owed to You</p>
+          <p className="text-stat-lg font-stat-lg text-[#16a34a]">₹{summary.totalOwedToMe.toLocaleString()}</p>
         </Card>
       </div>
 
       {activeLoans.length === 0 && closedLoans.length === 0 ? (
         <EmptyState message="Nothing here yet." actionLabel="Add your first loan or debt" onAction={handleAdd} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
           {activeLoans.map((loan) => {
             const paidPercent = loan.principalAmount > 0
               ? Math.round(((loan.principalAmount - loan.outstandingAmount) / loan.principalAmount) * 100)
@@ -100,36 +103,37 @@ const LoansList = () => {
 
             return (
               <Card key={loan._id}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <h4 style={{ margin: 0 }}>{loan.lenderName}</h4>
+                <div className="flex justify-between items-start gap-xs mb-xs">
+                  <h4 className="text-headline-md font-headline-md text-on-surface">{loan.lenderName}</h4>
                   {isDebt && (
-                    <span style={{
-                      background: isReceivable ? '#dcfce7' : '#fee2e2',
-                      color: isReceivable ? '#16a34a' : '#dc2626',
-                      padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600,
-                    }}>
+                    <span className={`px-2 py-0.5 rounded-full text-label-sm font-semibold shrink-0 ${
+                      isReceivable ? 'bg-[#16a34a]/10 text-[#16a34a]' : 'bg-[#dc2626]/10 text-[#dc2626]'
+                    }`}>
                       {isReceivable ? 'Owes You' : 'You Owe'}
                     </span>
                   )}
                 </div>
-                <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0.25rem 0' }}>
+                <p className="text-label-sm font-label-sm text-secondary mb-xs">
                   {TYPE_LABELS[loan.loanType]}{loan.emiAmount ? ` · EMI ₹${loan.emiAmount.toLocaleString()}` : ''}
                 </p>
-                {loan.note && <p style={{ color: '#9ca3af', fontSize: '0.8rem', fontStyle: 'italic', margin: '0.25rem 0' }}>{loan.note}</p>}
+                {loan.note && <p className="text-label-sm font-label-sm text-secondary italic mb-xs">{loan.note}</p>}
 
-                <div style={{ background: '#e5e7eb', borderRadius: '8px', height: '10px', overflow: 'hidden', margin: '0.5rem 0' }}>
-                  <div style={{ width: `${paidPercent}%`, background: isReceivable ? '#16a34a' : '#4f46e5', height: '100%' }} />
+                <div className="bg-surface-container-high rounded-full h-2.5 overflow-hidden my-sm">
+                  <div
+                    className={`h-full transition-all duration-300 ${isReceivable ? 'bg-[#16a34a]' : 'bg-primary-container'}`}
+                    style={{ width: `${Math.min(100, paidPercent)}%` }}
+                  />
                 </div>
-                <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                <p className="text-body-md font-body-md text-on-surface mb-xs">
                   ₹{loan.outstandingAmount.toLocaleString()} remaining of ₹{loan.principalAmount.toLocaleString()} ({paidPercent}% settled)
                 </p>
                 {loan.nextDueDate && (
-                  <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem' }}>
+                  <p className="text-label-sm font-label-sm text-secondary mb-sm">
                     Next due: {new Date(loan.nextDueDate).toLocaleDateString()}
                   </p>
                 )}
 
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <div className="flex gap-xs flex-wrap mt-sm">
                   <Button onClick={() => handlePayEmi(loan)} disabled={payingId === loan._id}>
                     {payingId === loan._id ? 'Processing...' : isDebt ? 'Log Repayment' : 'Pay EMI'}
                   </Button>
@@ -143,19 +147,19 @@ const LoansList = () => {
       )}
 
       {closedLoans.length > 0 && (
-        <div style={{ marginTop: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Settled / Closed</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div className="mt-lg">
+          <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Settled / Closed</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
             {closedLoans.map((loan) => (
               <Card key={loan._id}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <h4 style={{ margin: 0 }}>{loan.lenderName}</h4>
-                  <span style={{ background: '#dcfce7', color: '#16a34a', padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600 }}>
+                <div className="flex justify-between items-start gap-xs mb-xs">
+                  <h4 className="text-headline-md font-headline-md text-on-surface">{loan.lenderName}</h4>
+                  <span className="bg-[#16a34a]/10 text-[#16a34a] px-2 py-0.5 rounded-full text-label-sm font-semibold">
                     ✓ Settled
                   </span>
                 </div>
-                <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0.25rem 0' }}>{TYPE_LABELS[loan.loanType]}</p>
-                <Button variant="danger" onClick={() => handleDelete(loan._id)} style={{ marginTop: '0.5rem' }}>Delete</Button>
+                <p className="text-label-sm font-label-sm text-secondary mb-sm">{TYPE_LABELS[loan.loanType]}</p>
+                <Button variant="danger" onClick={() => handleDelete(loan._id)}>Delete</Button>
               </Card>
             ))}
           </div>

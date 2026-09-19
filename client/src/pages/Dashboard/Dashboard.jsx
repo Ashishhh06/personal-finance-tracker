@@ -47,42 +47,44 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      {/* Page header */}
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
         <div>
-          <h1>Dashboard</h1>
-          <p style={{ color: '#6b7280' }}>Welcome back, {user?.name}</p>
+          <h1 className="text-headline-lg font-headline-lg text-on-surface">Dashboard</h1>
+          <p className="text-body-md font-body-md text-secondary">Welcome back, {user?.name}</p>
         </div>
         <TimePeriodSelector value={period} onChange={setPeriod} />
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm mb-md">
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Income</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#16a34a' }}>
+          <p className="text-label-md font-label-md text-secondary">Total Income</p>
+          <p className="text-stat-lg font-stat-lg text-[#16a34a]">
             ₹{stats.totalIncome.toLocaleString()}
           </p>
         </Card>
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Expense</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: '#dc2626' }}>
+          <p className="text-label-md font-label-md text-secondary">Total Expense</p>
+          <p className="text-stat-lg font-stat-lg text-[#dc2626]">
             ₹{stats.totalExpense.toLocaleString()}
           </p>
         </Card>
         <Card>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Net Savings</p>
-          <p style={{ fontSize: '1.6rem', fontWeight: 700, color: stats.netSavings >= 0 ? '#16a34a' : '#dc2626' }}>
+          <p className="text-label-md font-label-md text-secondary">Net Savings</p>
+          <p className={`text-stat-lg font-stat-lg ${stats.netSavings >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
             ₹{stats.netSavings.toLocaleString()}
           </p>
         </Card>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+      {/* Chart + recent transactions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-md">
         {/* Spending by category */}
         <Card>
-          <h3 style={{ marginBottom: '1rem' }}>Spending by Category</h3>
+          <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Spending by Category</h3>
           {spendingByCategory.length === 0 ? (
-            <p style={{ color: '#6b7280', padding: '2rem 0', textAlign: 'center' }}>
+            <p className="text-body-md font-body-md text-secondary py-xl text-center">
               No expenses recorded for this period.
             </p>
           ) : (
@@ -110,36 +112,25 @@ const Dashboard = () => {
 
         {/* Recent transactions */}
         <Card>
-          <h3 style={{ marginBottom: '1rem' }}>Recent Transactions</h3>
+          <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Recent Transactions</h3>
           {recentTransactions.length === 0 ? (
-            <p style={{ color: '#6b7280', padding: '2rem 0', textAlign: 'center' }}>
+            <p className="text-body-md font-body-md text-secondary py-xl text-center">
               No transactions yet.
             </p>
           ) : (
-            <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+            <div className="max-h-[280px] overflow-y-auto">
               {recentTransactions.map((t) => (
                 <div
                   key={t._id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    padding: '0.5rem 0',
-                    borderBottom: '1px solid #f3f4f6',
-                  }}
+                  className="flex justify-between items-start py-2 border-b border-surface-container-high last:border-0"
                 >
                   <div>
-                    <p style={{ margin: 0 }}>{t.note || t.categoryId?.name || 'Uncategorized'}</p>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
+                    <p className="text-body-md font-body-md text-on-surface">{t.note || t.categoryId?.name || 'Uncategorized'}</p>
+                    <p className="text-label-sm font-label-sm text-secondary">
                       {t.categoryId?.name} · {new Date(t.date).toLocaleDateString()}
                     </p>
                   </div>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontWeight: 600,
-                      color: t.type === 'income' ? '#16a34a' : '#dc2626',
-                    }}
-                  >
+                  <p className={`text-label-md font-label-md font-semibold shrink-0 ml-sm ${t.type === 'income' ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
                     {t.type === 'income' ? '+' : '-'}₹{t.amount.toLocaleString()}
                   </p>
                 </div>
@@ -149,33 +140,36 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Placeholder sections for future steps */}
-      <Card style={{ marginTop: '1.5rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Net Worth</p>
-        <p style={{ fontSize: '1.8rem', fontWeight: 700, color: data.netWorth >= 0 ? '#16a34a' : '#dc2626' }}>
+      {/* Net Worth card */}
+      <Card className="mb-sm">
+        <p className="text-label-md font-label-md text-secondary">Net Worth</p>
+        <p className={`text-stat-lg font-stat-lg ${data.netWorth >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
           ₹{data.netWorth?.toLocaleString() ?? '—'}
         </p>
       </Card>
+
+      {/* AI Insight card */}
       {data.latestInsight ? (
-      <Card style={{ marginTop: '1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-          <p style={{ fontWeight: 600, margin: 0 }}>✨ Latest AI Insight</p>
-          <a href="/insights" style={{ fontSize: '0.85rem', color: '#4f46e5' }}>View all →</a>
-        </div>
-        <p style={{ whiteSpace: 'pre-line', margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
-          {data.latestInsight.message}
-        </p>
-      </Card>
-    ) : (
-      <Card style={{ marginTop: '1rem', textAlign: 'center' }}>
-        <p style={{ color: '#6b7280', margin: 0 }}>
-          No AI insights yet — <a href="/insights" style={{ color: '#4f46e5' }}>generate one</a>
-        </p>
-      </Card>
-    )}
-    <div style={{ marginTop: '1rem', padding: '1rem', color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center' }}>
-      Budget highlights and active goals will appear here in later steps.
-    </div>
+        <Card className="mb-sm">
+          <div className="flex justify-between items-center mb-sm">
+            <p className="text-label-md font-label-md font-semibold text-on-surface">✨ Latest AI Insight</p>
+            <a href="/insights" className="text-label-sm font-label-sm text-primary-container hover:underline">View all →</a>
+          </div>
+          <p className="text-body-md font-body-md text-on-surface whitespace-pre-line leading-relaxed">
+            {data.latestInsight.message}
+          </p>
+        </Card>
+      ) : (
+        <Card className="mb-sm text-center">
+          <p className="text-body-md font-body-md text-secondary">
+            No AI insights yet — <a href="/insights" className="text-primary-container hover:underline">generate one</a>
+          </p>
+        </Card>
+      )}
+
+      <div className="mt-sm p-sm text-secondary text-label-sm font-label-sm text-center">
+        Budget highlights and active goals will appear here in later steps.
+      </div>
     </div>
   );
 };

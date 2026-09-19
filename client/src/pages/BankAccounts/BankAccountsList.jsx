@@ -49,33 +49,36 @@ const BankAccountsList = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Bank Accounts</h1>
-        <Button onClick={handleAdd}>+ Add Account</Button>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Bank Accounts</h1>
+        <Button onClick={handleAdd}>
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          Add Account
+        </Button>
       </div>
 
-      <Card style={{ marginBottom: '1.5rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Total Cash (across {accounts.length} account{accounts.length !== 1 ? 's' : ''})</p>
-        <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>₹{total.toLocaleString()}</p>
+      <Card className="mb-md">
+        <p className="text-label-md font-label-md text-secondary">Total Cash (across {accounts.length} account{accounts.length !== 1 ? 's' : ''})</p>
+        <p className="text-stat-lg font-stat-lg text-on-surface">₹{total.toLocaleString()}</p>
       </Card>
 
       {accounts.length === 0 ? (
         <EmptyState message="No bank accounts added yet." actionLabel="Add your first account" onAction={handleAdd} />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
           {accounts.map((acc) => (
             <Card key={acc._id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <h4 style={{ margin: 0 }}>{acc.accountName}</h4>
+              <div className="flex justify-between items-start gap-xs mb-xs">
+                <h4 className="text-headline-md font-headline-md text-on-surface">{acc.accountName}</h4>
                 {acc.isPrimary && (
-                  <span style={{ background: '#e0e7ff', color: '#4f46e5', padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600 }}>
+                  <span className="bg-primary-container/10 text-primary-container px-2 py-0.5 rounded-full text-label-sm font-semibold shrink-0">
                     Primary
                   </span>
                 )}
               </div>
-              <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0.25rem 0' }}>{acc.bankName} · {TYPE_LABELS[acc.accountType]}</p>
-              <p style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0.5rem 0' }}>₹{acc.currentBalance.toLocaleString()}</p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <p className="text-label-sm font-label-sm text-secondary mb-xs">{acc.bankName} · {TYPE_LABELS[acc.accountType]}</p>
+              <p className="text-stat-lg font-stat-lg text-on-surface my-xs">₹{acc.currentBalance.toLocaleString()}</p>
+              <div className="flex gap-xs mt-sm">
                 <Button variant="secondary" onClick={() => handleEdit(acc)}>Edit</Button>
                 <Button variant="danger" onClick={() => handleDelete(acc._id)}>Delete</Button>
               </div>

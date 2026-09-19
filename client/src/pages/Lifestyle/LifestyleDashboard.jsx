@@ -65,8 +65,8 @@ const LifestyleDashboard = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Lifestyle</h1>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">Lifestyle</h1>
         <TimePeriodSelector value={period} onChange={setPeriod} />
       </div>
 
@@ -78,14 +78,14 @@ const LifestyleDashboard = () => {
         <EmptyState message="No tagged expenses found for this period. Add a tag (e.g. food, movies, trips, shopping, gym, gifts - anything you like) to an expense to see it here." />
       ) : (
         <>
-          <Card style={{ marginBottom: '1.5rem' }}>
-            <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>Total tagged spend this period</p>
-            <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>₹{total.toLocaleString()}</p>
+          <Card className="mb-md">
+            <p className="text-label-md font-label-md text-secondary">Total tagged spend this period</p>
+            <p className="text-stat-lg font-stat-lg text-[#dc2626]">₹{total.toLocaleString()}</p>
           </Card>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <Card>
-              <h3 style={{ marginBottom: '1rem' }}>Spend by Tag</h3>
+              <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Spend by Tag</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
@@ -100,25 +100,20 @@ const LifestyleDashboard = () => {
             </Card>
 
             <Card>
-              <h3 style={{ marginBottom: '1rem' }}>Tagged Transactions</h3>
-              <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+              <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">Tagged Transactions</h3>
+              <div className="max-h-[280px] overflow-y-auto">
                 {transactions.map((t) => (
                   <div
                     key={t._id}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '0.5rem 0',
-                      borderBottom: '1px solid #f3f4f6',
-                    }}
+                    className="flex justify-between items-start py-2 border-b border-surface-container-high last:border-0"
                   >
                     <div>
-                      <p style={{ margin: 0 }}>{t.note || t.categoryId?.name}</p>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
+                      <p className="text-body-md font-body-md text-on-surface">{t.note || t.categoryId?.name}</p>
+                      <p className="text-label-sm font-label-sm text-secondary">
                         {t.tags.join(', ')} · {new Date(t.date).toLocaleDateString()}
                       </p>
                     </div>
-                    <p style={{ margin: 0, fontWeight: 600 }}>₹{t.amount.toLocaleString()}</p>
+                    <p className="text-label-md font-label-md font-semibold text-[#dc2626] shrink-0 ml-sm">₹{t.amount.toLocaleString()}</p>
                   </div>
                 ))}
               </div>

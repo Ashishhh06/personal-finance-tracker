@@ -1,18 +1,12 @@
 const EmptyState = ({ message = 'Nothing here yet.', actionLabel, onAction }) => {
   return (
-    <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#6b7280' }}>
-      <p style={{ marginBottom: '1rem' }}>{message}</p>
+    <div className="text-center py-xl px-sm text-secondary">
+      <span className="material-symbols-outlined text-[48px] text-outline-variant mb-sm block">inbox</span>
+      <p className="mb-md text-body-md font-body-md">{message}</p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          style={{
-            padding: '0.5rem 1rem',
-            background: '#4f46e5',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-          }}
+          className="px-md py-sm bg-primary-container text-on-primary rounded-lg text-label-md font-label-md hover:bg-primary transition-colors"
         >
           {actionLabel}
         </button>

@@ -4,38 +4,19 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   return (
     <div
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-margin-mobile"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#fff',
-          borderRadius: '10px',
-          padding: '1.5rem',
-          minWidth: '320px',
-          maxWidth: '90%',
-          maxHeight: '85vh',
-          overflowY: 'auto',
-        }}
+        className="bg-surface-container-lowest rounded-xl p-md w-full max-w-[520px] max-h-[85vh] overflow-y-auto card-shadow"
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <h3 style={{ margin: 0 }}>{title}</h3>
+        <div className="flex justify-between items-center mb-md">
+          <h3 className="text-headline-md font-headline-md text-on-surface">{title}</h3>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}
+            className="text-secondary hover:text-on-surface transition-colors"
           >
-            ✕
+            <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         {children}

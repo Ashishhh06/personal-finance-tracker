@@ -124,18 +124,19 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
   }
 };
 
-  const inputStyle = { width: '100%', padding: '0.5rem', marginTop: '0.25rem' };
-  const groupStyle = { marginBottom: '1rem' };
+  const inputCls = 'w-full mt-xs px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container';
+  const labelCls = 'block text-label-md font-label-md text-on-surface-variant';
+  const groupCls = 'mb-sm';
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={groupStyle}>
-        <label>Category</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Category</label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           required
-          style={inputStyle}
+          className={inputCls}
         >
           <option value="">Select a category</option>
           {categories.map((c) => (
@@ -146,8 +147,8 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
         </select>
       </div>
 
-      <div style={groupStyle}>
-        <label>Amount</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Amount</label>
         <input
           type="number"
           value={amount}
@@ -155,43 +156,43 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
           required
           min="0"
           step="0.01"
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      <div style={groupStyle}>
-        <label>Date</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Date</label>
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-          style={inputStyle}
+          className={inputCls}
         />
       </div>
 
-      <div style={groupStyle}>
-        <label>Note</label>
+      <div className={groupCls}>
+        <label className={labelCls}>Note</label>
         <input
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="e.g. Swiggy dinner order"
-          style={inputStyle}
+          className={inputCls}
         />
         {aiSuggesting && (
-          <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem' }}>Checking category...</p>
+          <p className="mt-xs text-label-sm font-label-sm text-secondary">Checking category...</p>
         )}
         {!aiSuggesting && aiConfidence !== null && aiConfidence < 50 && (
-          <p style={{ fontSize: '0.8rem', color: '#f59e0b', marginTop: '0.25rem' }}>
+          <p className="mt-xs text-label-sm font-label-sm text-[#f59e0b]">
             AI wasn't sure — please confirm the category.
           </p>
         )}
       </div>
 
-      <div style={groupStyle}>
-        <label>Payment Method</label>
-        <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={inputStyle}>
+      <div className={groupCls}>
+        <label className={labelCls}>Payment Method</label>
+        <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className={inputCls}>
           <option value="">Select</option>
           <option value="Cash">Cash</option>
           <option value="Card">Card</option>
@@ -202,16 +203,16 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
 
 
       {type === 'expense' && (
-        <div style={groupStyle}>
-          <label>Tags (comma-separated)</label>
+        <div className={groupCls}>
+          <label className={labelCls}>Tags (comma-separated)</label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="e.g. food, movies, trip:Goa2026"
-            style={inputStyle}
+            className={inputCls}
           />
-          <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem' }}>
+          <p className="mt-xs text-label-sm font-label-sm text-secondary">
           Common tags: food, movies, trips, shopping
           </p>
         </div>
@@ -219,31 +220,31 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
 
       {/* Dynamic extra fields based on selected category */}
       {extraFields.length > 0 && (
-        <div style={{ ...groupStyle, padding: '1rem', background: '#f9fafb', borderRadius: '8px' }}>
-          <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Additional details for {selectedCategory.name}</p>
+        <div className="mb-sm p-sm bg-surface-container-low rounded-lg">
+          <p className="text-label-md font-label-md font-semibold text-on-surface mb-sm">Additional details for {selectedCategory.name}</p>
           {extraFields.map((field) => (
-            <div key={field} style={groupStyle}>
-              <label style={{ textTransform: 'capitalize' }}>
+            <div key={field} className={groupCls}>
+              <label className={`${labelCls} capitalize`}>
                 {field.replace(/([A-Z])/g, ' $1')}
               </label>
               <input
                 type="text"
                 value={extraData[field] || ''}
                 onChange={(e) => handleExtraFieldChange(field, e.target.value)}
-                style={inputStyle}
+                className={inputCls}
               />
             </div>
           ))}
         </div>
       )}
 
-      <div style={groupStyle}>
-        <label>
+      <div className={groupCls}>
+        <label className="flex items-center gap-sm text-label-md font-label-md text-on-surface cursor-pointer">
           <input
             type="checkbox"
             checked={isRecurring}
             onChange={(e) => setIsRecurring(e.target.checked)}
-            style={{ marginRight: '0.5rem' }}
+            className="w-4 h-4 accent-primary-container"
           />
           Recurring
         </label>
@@ -251,7 +252,7 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
           <select
             value={recurringFrequency}
             onChange={(e) => setRecurringFrequency(e.target.value)}
-            style={{ ...inputStyle, marginTop: '0.5rem' }}
+            className={`${inputCls} mt-sm`}
           >
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
@@ -260,9 +261,9 @@ const TransactionForm = ({ type, existingTransaction, onSuccess, onCancel }) => 
         )}
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="mt-xs text-label-sm font-label-sm text-[#dc2626]">{error}</p>}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+      <div className="flex gap-sm mt-md">
         <Button type="submit" disabled={loading}>
           {loading ? 'Saving...' : existingTransaction ? 'Update' : 'Add'} {type === 'expense' ? 'Expense' : 'Income'}
         </Button>

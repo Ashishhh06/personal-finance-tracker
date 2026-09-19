@@ -68,8 +68,8 @@ const InsightsPage = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>AI Insights</h1>
+      <div className="flex flex-wrap justify-between items-center gap-sm mb-md">
+        <h1 className="text-headline-lg font-headline-lg text-on-surface">AI Insights</h1>
         <Button onClick={handleGenerate} disabled={generating}>
           {generating ? 'Generating...' : '✨ Refresh Insights'}
         </Button>
@@ -86,39 +86,32 @@ const InsightsPage = () => {
           onAction={handleGenerate}
         />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="flex flex-col gap-sm">
           {insights.map((insight) => (
             <Card key={insight._id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#4f46e5',
-                    textTransform: 'uppercase',
-                  }}
-                >
+              <div className="flex justify-between items-center mb-xs">
+                <span className="text-label-sm font-label-sm font-semibold text-primary-container uppercase tracking-wider">
                   {insight.relatedModule}
                 </span>
-                <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
+                <span className="text-label-sm font-label-sm text-secondary">
                   {new Date(insight.createdAt).toLocaleString()}
                 </span>
               </div>
-              <p style={{ whiteSpace: 'pre-line', margin: 0, lineHeight: 1.6 }}>{insight.message}</p>
+              <p className="text-body-md font-body-md text-on-surface whitespace-pre-line leading-relaxed">{insight.message}</p>
             </Card>
           ))}
         </div>
       )}
 
-      <Card style={{ marginTop: '2rem' }}>
-        <h3 style={{ marginBottom: '1rem' }}>💬 Ask a Question</h3>
+      <Card className="mt-lg">
+        <h3 className="text-headline-md font-headline-md text-on-surface mb-sm">💬 Ask a Question</h3>
 
         {qaHistory.length > 0 && (
-          <div style={{ marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+          <div className="mb-md max-h-[300px] overflow-y-auto flex flex-col gap-sm">
             {qaHistory.map((qa, idx) => (
-              <div key={idx} style={{ marginBottom: '1rem' }}>
-                <p style={{ fontWeight: 600, margin: '0 0 0.25rem 0' }}>You: {qa.question}</p>
-                <p style={{ margin: 0, color: '#374151', background: '#f5f3ff', padding: '0.6rem 0.8rem', borderRadius: '8px' }}>
+              <div key={idx}>
+                <p className="text-label-md font-label-md font-semibold text-on-surface mb-xs">You: {qa.question}</p>
+                <p className="text-body-md font-body-md text-on-surface bg-surface-container-low p-sm rounded-lg border border-surface-container-high leading-relaxed">
                   {qa.answer}
                 </p>
               </div>
@@ -126,13 +119,13 @@ const InsightsPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleAskQuestion} style={{ display: 'flex', gap: '0.5rem' }}>
+        <form onSubmit={handleAskQuestion} className="flex gap-sm items-center">
           <input
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="e.g. How much did I spend on food last month?"
-            style={{ flex: 1, padding: '0.6rem' }}
+            className="flex-1 px-3 py-2 border border-outline-variant rounded-lg text-body-md text-on-surface bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container"
             disabled={asking}
           />
           <Button type="submit" disabled={asking || !question.trim()}>
